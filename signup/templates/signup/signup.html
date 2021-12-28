@@ -1,0 +1,19 @@
+<body>
+  <h3>Create your account</h3>
+  <form action="" method="post">
+    {% csrf_token %}
+    <div>
+      {{form.username.label}}
+      {{form.username}}
+    </div>
+    <div>
+      {{form.phone.label}}
+      {{form.phone}}
+    </div>
+    <div>
+      {{form.date_of_birth.label}}
+      {{form.date_of_birth}}
+    </div>
+    <input type="submit" value="Next">
+  </form>
+</body>
