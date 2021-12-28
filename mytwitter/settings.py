@@ -111,6 +111,8 @@ TIME_ZONE = 'Asia/Tokyo'
 
 PHONENUMBER_DEFAULT_REGION = 'JP'
 
+AUTH_USER_MODEL = 'signup.User'
+
 USE_I18N = True
 
 USE_L10N = True
