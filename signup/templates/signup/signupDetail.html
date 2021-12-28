@@ -1,0 +1,22 @@
+<body>
+    <h1>Create your account</h1>
+    <div>
+        <ul>
+            <li>{{ user.username }}</li>
+            {% if user.phone %}
+                <li>{{ user.phone }}</li>
+            {% endif %}
+            {% if user.email %}
+                <li>{{ user.email }}</li>
+            {% endif %}
+            <li>{{ user.date_of_birth }}</li>
+        </ul>
+        <p>By signing up, you agree to the 
+            <a href="">Terms of Service</a> and <a href="">Privacy Policy</a>,
+            including <a href="">Cookie Use</a>. 
+            Others will be able to find you by email or phone number when provided.
+        </p>
+        <button>Sign up</button>
+    </div>
+
+</body>

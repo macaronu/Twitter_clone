@@ -1,20 +1,18 @@
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'signup/style.css' %}">
-
 <body>
-  <h2>Create your account</h2>
-  <form method="post" novalidate>
+  <h3>Create your account</h3>
+  <form action="" method="post">
     {% csrf_token %}
     <div>
-      {% for field in form %}
-      <p>
-        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-        {{ field }}
-      </p>
-      <ul>{{ field.errors }}</ul>
-      {% endfor %}
-      <p class="note">Phone number is optional.</p>
-      <p class="note">Birthdays will not be shown publicly. Confirm your own age, even if this account is for a business, a pet, or something else</p>
+      {{form.username.label}}
+      {{form.username}}
+    </div>
+    <div>
+      {{form.phone.label}}
+      {{form.phone}}
+    </div>
+    <div>
+      {{form.date_of_birth.label}}
+      {{form.date_of_birth}}
     </div>
     <input type="submit" value="Next">
   </form>
