@@ -1,50 +1,47 @@
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from .forms import SignupForm, PasswordForm
-from django.views.generic import FormView
 
 # Views for signing up
 
-def signupPage(request):
-    session_form_data1 = request.session.get('form_data1')
-    form = SignupForm(session_form_data1)
+def signup_view(request):
+    session_form_data = request.session.get('info_form_data')
+    form = SignupForm(session_form_data)
     if request.method == "POST":
         form = SignupForm(request.POST)
-        print (form.errors.as_data())
         if form.is_valid():
-            request.session['form_data1'] = request.POST
+            request.session['info_form_data'] = request.POST
             return redirect('user:create_password')
-
     return render(request, 'user/signup.html', {'form':form})
 
-def passwordPage(request):
-    session_form_data1 = request.session.get('form_data1')
+def password_view(request):
+    session_form_data = request.session.get('info_form_data')
     # session expired or invalid access
-    if session_form_data1 is None:
+    if session_form_data is None:
         return redirect('user:signup')
     # default form
-    form = PasswordForm(session_form_data1)
+    form = PasswordForm(session_form_data)
     # user inputs password
     if request.method == "POST":
         form = PasswordForm(request.POST)
         if form.is_valid():
-            request.session['form_data2'] = request.POST
+            request.session['password_form_data'] = request.POST
             return redirect('user:confirm')
     return render(request, 'user/password.html', {'form':form})
 
-def signupConfirm(request):
-    session_form_data2 = request.session.get('form_data2')
-    if session_form_data2 is None:
+def signup_confirm_view(request):
+    session_form_data = request.session.get('password_form_data')
+    if session_form_data is None:
         return redirect('user:signup')
-
-    form = PasswordForm(session_form_data2)
+    
+    form = PasswordForm(session_form_data)
     if request.method == "POST":
         form = PasswordForm(request.POST)
         if form.is_valid():
-            del request.session['form_data1']
-            del request.session['form_data2']
+            del request.session['info_form_data']
+            del request.session['password_form_data']
             form.save()
             return redirect('user:thanks')
     return render(request, 'user/signupConfirm.html', {'form':form})
 
-def thanks(request):
+def signup_thanks_view(request):
     return render(request,'user/thanks.html')

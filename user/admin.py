@@ -1,10 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DjUserAdmin
-from .models import User
+from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext, gettext_lazy as _
+from .models import User
 
 # Register your models here.
-class UserAdmin(DjUserAdmin):
+class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('date_of_birth', 'email', 'phone')}),
@@ -14,4 +14,4 @@ class UserAdmin(DjUserAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, CustomUserAdmin)

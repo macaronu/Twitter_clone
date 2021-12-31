@@ -1,9 +1,8 @@
-from django import forms
-from django.forms import ModelForm
-from django.contrib.auth.forms import UserCreationForm
-from .models import User
-from django.core.exceptions import ValidationError
 import datetime
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.forms import ModelForm
+from .models import User
 
 class SignupForm(ModelForm):
 
@@ -22,5 +21,5 @@ class PasswordForm(UserCreationForm):
         fields = ['username', 'email', 'phone', 'date_of_birth', 'password1', 'password2']
         
         current_year = datetime.datetime.now().year
-        BirthYearChoices = range(1901, current_year + 1)
-        widgets = { 'date_of_birth': forms.SelectDateWidget(years=BirthYearChoices)}
+        birth_year_choices = range(1901, current_year + 1)
+        widgets = { 'date_of_birth': forms.SelectDateWidget(years=birth_year_choices)}
