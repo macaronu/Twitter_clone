@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'phonenumber_field',
-    'signup.apps.SignupConfig',
+    'user.apps.UserConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -111,7 +111,7 @@ TIME_ZONE = 'Asia/Tokyo'
 
 PHONENUMBER_DEFAULT_REGION = 'JP'
 
-AUTH_USER_MODEL = 'signup.User'
+AUTH_USER_MODEL = 'user.User'
 
 USE_I18N = True
 

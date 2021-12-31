@@ -7,7 +7,7 @@ import phonenumber_field.modelfields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signup', '0002_remove_user_phone'),
+        ('user', '0002_remove_user_phone'),
     ]
 
     operations = [
