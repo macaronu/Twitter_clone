@@ -2,11 +2,11 @@ import datetime
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from .models import User
+from .models import CustomUser
 
 class SignupForm(ModelForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['username', 'email', 'phone', 'date_of_birth']
 
         current_year = datetime.datetime.now().year
@@ -16,7 +16,7 @@ class SignupForm(ModelForm):
 
 class PasswordForm(UserCreationForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['username', 'email', 'phone', 'date_of_birth', 'password1', 'password2']
         
         current_year = datetime.datetime.now().year
