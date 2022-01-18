@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
+
 from .forms import SignupForm, PasswordForm
 
 # Views for signing up
-
 def signup_view(request):
     session_form_data = request.session.get('info_form_data')
     form = SignupForm(session_form_data)
