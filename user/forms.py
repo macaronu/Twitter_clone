@@ -1,8 +1,7 @@
 import datetime
 
-from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm
+from django.forms import ModelForm, SelectDateWidget
 
 from .models import CustomUser
 
@@ -14,7 +13,7 @@ class SignupForm(ModelForm):
 
         current_year = datetime.datetime.now().year
         BirthYearChoices = range(1901, current_year + 1)
-        widgets = { 'date_of_birth': forms.SelectDateWidget(years=BirthYearChoices)}
+        widgets = { 'date_of_birth': SelectDateWidget(years=BirthYearChoices)}
         error_messages = {'phone':{ 'invalid': 'Enter a valid phone number.' }}
 
 class PasswordForm(UserCreationForm):
@@ -24,4 +23,4 @@ class PasswordForm(UserCreationForm):
         
         current_year = datetime.datetime.now().year
         birth_year_choices = range(1901, current_year + 1)
-        widgets = { 'date_of_birth': forms.SelectDateWidget(years=birth_year_choices)}
+        widgets = { 'date_of_birth': SelectDateWidget(years=birth_year_choices)}
