@@ -27,7 +27,7 @@ class HomeViewTests(TestCase):
         response = self.client.get(reverse('user:signup'))
         self.assertEqual(response.status_code, 200)
 
-class SessionViewTests(TestCase):
+class PasswordViewTests(TestCase):
     def setUp(self):
         self.info_session_data = {
             'username': 'test', 
@@ -37,6 +37,22 @@ class SessionViewTests(TestCase):
             'date_of_birth_day': '1', 
             'date_of_birth_year': '1901'
         }
+
+    def test_get_password_view(self):
+        # GET method returns status code 200 with session data
+        session = self.client.session
+        session['info_form_data'] = self.info_session_data
+        session.save()
+        response = self.client.get(reverse('user:create_password'))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_get_password_view_with_invalid_session(self):
+        # Redirects to home view without session data
+        response = self.client.get(reverse('user:create_password'))
+        self.assertRedirects(response, reverse('user:signup'))
+
+class ConfirmViewTests(TestCase):
+    def setUp(self):
         self.password_session_data = {
             'username': 'test', 
             'email': 'test@test.com', 
@@ -47,15 +63,6 @@ class SessionViewTests(TestCase):
             'password1': 'testpassword', 
             'password2': 'testpassword'
         }
-
-    def test_get_password_view(self):
-        # GET method returns status code 200 with session data
-        session = self.client.session
-        session['info_form_data'] = self.info_session_data
-        session.save()
-        response = self.client.get(reverse('user:create_password'))
-        self.assertEqual(response.status_code, 200)
-
     def test_get_confirm_view(self):
         # GET method returns status code 200 with session data
         session = self.client.session
@@ -64,12 +71,7 @@ class SessionViewTests(TestCase):
         response = self.client.get(reverse('user:confirm'))
         self.assertEqual(response.status_code, 200)
     
-    def test_get_password_view_with_invalid_session(self):
-        # Redirects to home view without session data
-        response = self.client.get(reverse('user:create_password'))
-        self.assertRedirects(response, reverse('user:signup'))
-    
-    def test_confirm_view_with_invalid_session(self):
+    def test_get_confirm_view_with_invalid_session(self):
         # Returns to home view without session data
         response = self.client.get(reverse('user:confirm'))
         self.assertRedirects(response, reverse('user:signup'))
@@ -167,48 +169,26 @@ class InvalidSignupTests(TestCase):
     
     def test_username_is_blank(self):
         # Posting a blank username brings you back to the form and raises errors
-        blank_username = {
-            'username': '', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901'
-        }
-        response = self.client.post(reverse('user:signup'), blank_username)
+        self.valid_info_data['username'] = ''
+        response = self.client.post(reverse('user:signup'), self.valid_info_data)
         self.assertEquals(response.status_code, 200)
         self.assertFormError(response, 'form', 'username', 'This field is required.')
     
     def test_email_is_blank(self):
         # Posting a blank email brings you back to the form and raises errors
-        blank_email = {
-            'username': 'test', 
-            'email': '', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901'
-        }
-        response = self.client.post(reverse('user:signup'), blank_email)
+        self.valid_info_data['email'] = ''
+        response = self.client.post(reverse('user:signup'), self.valid_info_data)
         self.assertEquals(response.status_code, 200)
         self.assertFormError(response, 'form', 'email', 'This field is required.')
     
     def test_password_is_blank(self):
         # Posting a blank password brings you back to the form and raises errors
-        blank_password = {
-            'username': 'test', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901',
-            'password1': '',
-            'password2': ''
-        }
+        self.valid_password_data['password1'] = ''
+        self.valid_password_data['password2'] = ''
         session = self.client.session
         session['info_form_data'] = self.valid_info_data
         session.save()
-        response = self.client.post(reverse('user:create_password'), blank_password)
+        response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertEquals(response.status_code, 200)
         self.assertFormError(response, 'form', 'password1', 'This field is required.')
         self.assertFormError(response, 'form', 'password2', 'This field is required.')
@@ -216,48 +196,25 @@ class InvalidSignupTests(TestCase):
     def test_username_taken(self):
         # An existing username brings you back to the form and raises errors
         CustomUser.objects.create(username="test", email='test@test.com', date_of_birth='2001-12-31')
-        taken_username = {
-            'username': 'test', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901'
-        }
-        response = self.client.post(reverse('user:signup'), taken_username)
+        response = self.client.post(reverse('user:signup'), self.valid_info_data)
         self.assertFormError(response, 'form', 'username', 'A user with that username already exists.')
         self.assertEquals(response.status_code, 200)
     
     def test_invalid_email(self):
         # An invalid email brings you back to the form and raises errors
-        invalid_email = {
-            'username': 'test', 
-            'email': 'test', 
-            'phone': '',
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901'
-        }
-        response = self.client.post(reverse('user:signup'), invalid_email)
+        self.valid_info_data['email'] = 'test'
+        response = self.client.post(reverse('user:signup'), self.valid_info_data)
         self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
         self.assertEquals(response.status_code, 200)
     
     def test_invalid_password(self):
         # Short or similar passwords are invalid.
-        invalid_password = {
-            'username': 'test', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901',
-            'password1': 'test',
-            'password2': 'test'
-        }
+        self.valid_password_data['password1'] = 'test'
+        self.valid_password_data['password2'] = 'test'
         session = self.client.session
         session['info_form_data'] = self.valid_info_data
         session.save()
-        response = self.client.post(reverse('user:create_password'), invalid_password)
+        response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertFormError(response, 'form', 'password2', 'This password is too short. It must contain at least 8 characters.')
         self.assertFormError(response, 'form', 'password2', 'The password is too similar to the email.')
         self.assertFormError(response, 'form', 'password2', 'The password is too similar to the username.')
@@ -265,38 +222,22 @@ class InvalidSignupTests(TestCase):
 
     def test_invalid_password(self):
         # Passwords with only numbers are invalid.
-        numeric_password = {
-            'username': 'test', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901',
-            'password1': '12345678',
-            'password2': '12345678'
-        }
+        self.valid_password_data['password1'] = '12345678'
+        self.valid_password_data['password2'] = '12345678'
         session = self.client.session
         session['info_form_data'] = self.valid_info_data
         session.save()
-        response = self.client.post(reverse('user:create_password'), numeric_password)
+        response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertFormError(response, 'form', 'password2', 'This password is entirely numeric.')
         self.assertEquals(response.status_code, 200)
 
     def test_mismatching_password(self):
         # Two passwords do not match
-        mismatching_password = {
-            'username': 'test', 
-            'email': 'test@test.com', 
-            'phone': '', 
-            'date_of_birth_month': '1', 
-            'date_of_birth_day': '1', 
-            'date_of_birth_year': '1901',
-            'password1': 'testtest',
-            'password2': 'hogehoge'
-        }
+        self.valid_password_data['password1'] = 'testtest'
+        self.valid_password_data['password2'] = 'hogehoge'
         session = self.client.session
         session['info_form_data'] = self.valid_info_data
         session.save()
-        response = self.client.post(reverse('user:create_password'), mismatching_password)
+        response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertFormError(response, 'form', 'password2', "The two password fields didn’t match.")
         self.assertEquals(response.status_code, 200)
