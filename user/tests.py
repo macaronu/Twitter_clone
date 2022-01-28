@@ -21,11 +21,13 @@ class CreateUserFormTests(TestCase):
         form = SignupForm(data={"email": ""})
         self.assertEqual(form.errors["email"], ["This field is required."])
 
+
 class HomeViewTests(TestCase):
     def test_get_signup_view(self):
         # GET method returns status code 200
         response = self.client.get(reverse('user:signup'))
         self.assertEqual(response.status_code, 200)
+
 
 class PasswordViewTests(TestCase):
     def setUp(self):
@@ -51,6 +53,7 @@ class PasswordViewTests(TestCase):
         response = self.client.get(reverse('user:create_password'))
         self.assertRedirects(response, reverse('user:signup'))
 
+
 class ConfirmViewTests(TestCase):
     def setUp(self):
         self.password_session_data = {
@@ -75,6 +78,7 @@ class ConfirmViewTests(TestCase):
         # Returns to home view without session data
         response = self.client.get(reverse('user:confirm'))
         self.assertRedirects(response, reverse('user:signup'))
+
 
 class ValidSignupTests(TestCase):
     def setUp(self):
@@ -125,6 +129,7 @@ class ValidSignupTests(TestCase):
         response = self.client.post(reverse('user:confirm'), self.valid_password_data)
         self.assertTrue(CustomUser.objects.filter(username='test').exists())
         self.assertRedirects(response, reverse('user:thanks'))
+
 
 class InvalidSignupTests(TestCase):
     def setUp(self):
