@@ -1,0 +1,41 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+        <h2>Create your account</h2>
+        <div>
+            {% for field in form %} {% if field != form.password1 and field != form.password2 %}
+            <p>
+                {% if not field.value %}
+                    <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label> - 
+                {% else %}
+                    <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                    {{ field.value }}
+                {% endif %}
+            </p>
+            {% endif %}{% endfor %}
+            <p>
+                {{form.password1.label_tag}}
+                {% for char in form.password1.value %}*{% endfor %}
+            </p>
+
+            <p style="color:gray; font-size:small;">
+                By signing up, you agree to the 
+                <a href="https://pbs.twimg.com/media/BrsY3c6CIAAUJ_A.jpg">Terms of Service</a> 
+                and <a href="https://www.kfc.co.jp/">Privacy Policy</a>,
+                including <a href="https://www.google.com/url?sa=i&url=https%3A%2F%2Ftenor.com%2Fsearch%2Fcomegalletas-gifs&psig=AOvVaw09jV0g-P8PSuN8spdZDaFG&ust=1640653716283000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiY9MDlgvUCFQAAAAAdAAAAABAD">Cookie Use</a>. 
+                Others will be able to find you by email or phone number when provided.
+            </p>
+            <form action="" method="POST">
+                <button type="submit">Signup</button>
+                {% for field in form %}{{ field.as_hidden }}{% endfor %}
+                {% csrf_token %}
+            </form>
+            <form action="{% url 'user:signup' %}" method="GET">
+                <button type="submit">Back</button>
+            </form>
+        </div>
+    </body>
+</html>
