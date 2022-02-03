@@ -1,0 +1,29 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+        <div class="index">
+            <div class="index-content">
+                <h1 style="padding-top: 50px; font-size: 50px;">Happening now</h1>
+                <h1>Join twitter today.</h1>
+                <div style="margin-top: 50px;">
+                    <a class="blue-btn" href="{% url 'user:signup' %}">Signup with email</a>
+                    <p class="note" style="max-width: 50%;">
+                        By signing up, you agree to the 
+                        <a href="https://pbs.twimg.com/media/BrsY3c6CIAAUJ_A.jpg">Terms of Service</a> 
+                        and <a href="https://www.kfc.co.jp/">Privacy Policy</a>,
+                        including <a href="https://www.google.com/url?sa=i&url=https%3A%2F%2Ftenor.com%2Fsearch%2Fcomegalletas-gifs&psig=AOvVaw09jV0g-P8PSuN8spdZDaFG&ust=1640653716283000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiY9MDlgvUCFQAAAAAdAAAAABAD">Cookie Use</a>. 
+                        Others will be able to find you by email or phone number when provided.
+                    </p>
+                </div>
+                <div style="margin-top: 50px;">
+                    <p style="padding: 10px; font-weight: bold;">Already have an account?</p>
+                    <a class="white-btn" href="{% url 'user:signin' %}">Sign in</a>
+                </div>
+            </div>
+            <div class="index-img"><img src="https://pbs.twimg.com/profile_images/448969877139648512/TVEJKyeJ_400x400.jpeg"></div>
+        </div>
+    </body>
+</html>

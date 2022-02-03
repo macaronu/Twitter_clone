@@ -1,0 +1,25 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+      </head>
+    <body>
+        <h2>Sign in to twitter</h2>
+        <form method = "post">
+            <div style="margin: 2rem;">
+                {% csrf_token %}
+                {% for field in form%}
+                    <p>
+                        {{field.label}} {{field}}
+                    </p>
+                {% endfor %}
+                {% if form.errors %}
+                    <ul>Please enter a correct username and password. Note that both fields may be case-sensitive.</ul>
+                {% endif %}
+            </div>
+            <input class="btn" type="submit" value="Sign in">
+        </form>
+        <a class="white-btn" href="{% url 'user:reset_password' %}">Forgot password?</a>
+        <p class="note" style="margin-top: 2rem;">Don't have an account? <a href="{% url 'user:signup' %}">Sign up</a></p>
+    </body>
+</html>
