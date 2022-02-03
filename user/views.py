@@ -19,7 +19,7 @@ def signup_view(request):
     else:
         session_form_data = request.session.get('info_form_data')
         form = SignupForm(session_form_data)
-    return render(request, 'user/signup.html', {'form':form})
+    return render(request, 'user/signup/signup.html', {'form':form})
 
 def password_view(request):
     session_form_data = request.session.get('info_form_data')
@@ -34,7 +34,7 @@ def password_view(request):
             return redirect('user:confirm')
     else:
         form = PasswordForm(session_form_data)
-    return render(request, 'user/password.html', {'form':form})
+    return render(request, 'user/signup/password.html', {'form':form})
 
 def signup_confirm_view(request):
     session_form_data = request.session.get('password_form_data')
@@ -50,7 +50,7 @@ def signup_confirm_view(request):
             return redirect('user:thanks')
     else:
         form = PasswordForm(session_form_data)
-    return render(request, 'user/signupConfirm.html', {'form':form})
+    return render(request, 'user/signup/signupConfirm.html', {'form':form})
 
 def signup_thanks_view(request):
     return render(request, 'user/signup/thanks.html')
