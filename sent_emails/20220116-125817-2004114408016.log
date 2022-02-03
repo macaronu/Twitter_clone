@@ -1,0 +1,25 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Password reset on 127.0.0.1:8000
+From: webmaster@localhost
+To: hage@gmail.com
+Date: Sun, 16 Jan 2022 03:58:17 -0000
+Message-ID: <164230549704.20308.1398287965019977590@LAPTOP-K20DCLP4>
+
+
+You're receiving this email because you requested a password reset for your user account at 127.0.0.1:8000.
+
+Please go to the following page to create your new password:
+
+http://127.0.0.1:8000/user/reset/Mg/azchd4-d8e87ba858bd3756b8330301e0d8b69a/
+
+Your username, in case you’ve forgotten: hage
+
+Thanks for using our site!
+
+The twitter cloning team
+
+
+
+-------------------------------------------------------------------------------
