@@ -17,10 +17,3 @@ urlpatterns = [
     path('password_reset/complete/', views.password_reset_complete_view.as_view(), name="password_reset_complete"),
     path('home/', views.home_view, name="home")
 ]
-
-"""
-path('reset/', views.password_reset_view.as_view(), name="reset"),
-    path('reset-done/', views.password_reset_done_view.as_view(), name="reset_done"),
-    path('reset-confirm/', views.password_reset_confirm_view.as_view(), name="password_reset_confirm"),
-    path('reset-complete/', views.password_reset_complete_view.as_view(), name="reset_complete"),
-"""
