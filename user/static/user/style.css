@@ -11,3 +11,103 @@ ul {
   color: rgb(22, 76, 175);
   font-size: small;
 }
+
+.blue-btn {
+  color: white;
+  font-size: small;
+  background-color: dodgerblue;
+  padding: 8px 50px;
+  text-decoration: none;
+  border-radius: 50px;
+}
+
+.white-btn {
+  color: black;
+  font-size: small;
+  padding: 8px 50px;
+  text-decoration: none;
+  border-radius: 50px;
+  border: thin solid gray;
+}
+
+.black-btn {
+  color: white;
+  padding: 8px 50px;
+  background-color: black;
+  text-decoration: none;
+  border-radius: 50px;
+}
+
+.btn {
+  color: white;
+  background-color: black;
+  border: none;
+  border-radius: 50px;
+  padding: 13px 85px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: small;
+}
+
+.btn-white {
+  background-color: white;
+  border: thin solid gray;
+  border-radius: 50px;
+  padding: 12px 85px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: small;
+}
+
+.index {
+  display: flex;
+  flex-direction: row-reverse;
+  position: relative;
+}
+
+.index-img {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgb(230, 139, 65);
+}
+
+.index-content {
+  position: relative;
+  padding: 36px;
+  min-width: 437px;
+  max-width: 760px;
+  width: 100%;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 880px), screen and (orientation: portrait) {
+  .index {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .index-img {
+    position: relative;
+    margin-right: 2rem;
+    width: 100%;
+    height: auto;
+  }
+  .index-content {
+    position: relative;
+    justify-content: center;
+    padding: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 350px;
+    max-width: 500px;
+    width: 100%;
+  }
+}
