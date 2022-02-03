@@ -6,10 +6,6 @@ from django.urls import reverse_lazy
 from .forms import SignupForm, PasswordForm
 
 # Views for signing up
-from django.urls import reverse_lazy
-from .forms import SignupForm, PasswordForm
-
-# Views for signing up
 
 def index_view(request):
     return render(request, 'user/index.html')
