@@ -29,12 +29,12 @@
                 Others will be able to find you by email or phone number when provided.
             </p>
             <form action="" method="POST">
-                <button type="submit">Signup</button>
+                <button class="btn" type="submit">Signup</button>
                 {% for field in form %}{{ field.as_hidden }}{% endfor %}
                 {% csrf_token %}
             </form>
             <form action="{% url 'user:signup' %}" method="GET">
-                <button type="submit">Back</button>
+                <button class="btn-white" type="submit">Back</button>
             </form>
         </div>
     </body>

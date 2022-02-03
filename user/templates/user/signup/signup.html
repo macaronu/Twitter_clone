@@ -7,7 +7,7 @@
     <h2>Create your account</h2>
     <form method="post" novalidate>
       {% csrf_token %}
-      <div>
+      <div style="margin: 2rem;">
         {% for field in form %}
         <p>
           <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
@@ -18,7 +18,8 @@
         <p class="note">Phone number is optional.</p>
         <p class="note">Birthdays will not be shown publicly. Confirm your own age, even if this account is for a business, a pet, or something else</p>
       </div>
-      <input type="submit" value="Next">
+      <input class="btn" type="submit" value="Next">
     </form>
+    <p class="note">Already have an account? <a href="{% url 'user:signin' %}">Sign in</a></p>
   </body>
 </html>
