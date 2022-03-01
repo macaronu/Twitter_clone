@@ -1,5 +1,12 @@
 <html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
     <body>
-        <p>Welcome to your twitter account.</p>
+        {% if user.is_authenticated %}
+        <h2>Welcome to your twitter account.</h2>
+        <p>Feel like logging out?</p>
+        <input class="btn" type="submit" value="Log out">
     </body>
 </html>

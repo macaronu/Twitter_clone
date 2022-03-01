@@ -5,7 +5,7 @@
       </head>
     <body>
         <h2>Sign in to twitter</h2>
-        <form method = "post">
+        <form method = "post" novalidate>
             <div style="margin: 2rem;">
                 {% csrf_token %}
                 {% for field in form%}

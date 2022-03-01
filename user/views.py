@@ -77,5 +77,6 @@ class password_reset_confirm_view(PasswordResetConfirmView):
 class password_reset_complete_view(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
 
+# Views for users
 def home_view(request):
     return render(request, 'user/home.html')
