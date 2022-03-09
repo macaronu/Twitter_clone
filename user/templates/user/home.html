@@ -5,6 +5,7 @@
     </head>
     <body>
         {% if user.is_authenticated %}
+            <h1 style="padding-top: 50px; font-size: 50px;">Hi, {{ user }}!</h1>
             <h2>Welcome to your twitter account.</h2>
             <p>Feel like signing out?</p>
             <a class="white-btn" href="{% url 'user:signout' %}">Sign out</a>
