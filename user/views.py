@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
@@ -59,6 +59,10 @@ def signup_thanks_view(request):
 class signin_view(LoginView):
     template_name = 'user/signin.html'
     next_page = 'user:home'
+
+# Views for signing out
+class signout_view(LogoutView):
+    template_name = 'user/signedout.html'
 
 # Views for resetting password
 

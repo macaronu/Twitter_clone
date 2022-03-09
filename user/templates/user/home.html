@@ -5,8 +5,15 @@
     </head>
     <body>
         {% if user.is_authenticated %}
-        <h2>Welcome to your twitter account.</h2>
-        <p>Feel like logging out?</p>
-        <input class="btn" type="submit" value="Log out">
+            <h2>Welcome to your twitter account.</h2>
+            <p>Feel like signing out?</p>
+            <a class="white-btn" href="{% url 'user:signout' %}">Sign out</a>
+        {% endif %}
+        {% if not user.is_authenticated %}
+            <img src="https://www.userlike.com/api/proxy/resize/troll-chat-tips/troll.jpg?height=720" style="width:320px; border-radius: 8px;">
+            <h2>Oops! Access denied.</h2>
+            <p>Seems like you haven't signed in yet.</p>
+            <a class="white-btn" href="{% url 'user:signin' %}">Sign in</a>
+        {% endif %}
     </body>
 </html>
