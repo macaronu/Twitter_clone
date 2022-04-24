@@ -83,6 +83,7 @@ class SignoutView(LogoutView):
     template_name = "user/signedout.html"
 
 
+>>>>>>> 8f69bbe (Created tweet function)
 # Views for resetting password
 class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
