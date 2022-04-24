@@ -189,6 +189,29 @@ ul {
   padding-bottom: 1rem;
 }
 
+.prof-foot {
+  margin-top: 100px;
+  margin-left: 2rem;
+  float: left;
+}
+
+.prof-head {
+  margin-right: 30%;
+  margin-top: -70px;
+  float: right;
+}
+
+.follow-count {
+  color: rgb(0, 65, 131);
+  float: left;
+  clear: both;
+  display: flex;
+  font-weight: bold;
+}
+.follow-count ul {
+  float: left;
+}
+
 .tweet {
   padding: 20px 20px 20px 20px;
   display: flex;

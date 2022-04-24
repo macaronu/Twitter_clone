@@ -13,7 +13,7 @@ from django.views.generic import DetailView, ListView
 from django.urls import reverse_lazy
 from extra_views import UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin
 
-from .models import CustomUser, Profile
+from .models import CustomUser, Profile, Follow
 from .forms import SignupForm, PasswordForm
 from tweets.models import Tweet
 
@@ -83,7 +83,6 @@ class SignoutView(LogoutView):
     template_name = "user/signedout.html"
 
 
->>>>>>> 8f69bbe (Created tweet function)
 # Views for resetting password
 class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
@@ -121,7 +120,18 @@ class ProfileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         page_user = get_object_or_404(CustomUser, id=self.kwargs["pk"])
         tweets = Tweet.objects.filter(user_id=page_user.id)
+        request_user = self.request.user
+        context["request_user"] = request_user
         context["tweets"] = tweets
+        context["following"] = Follow.objects.filter(follower=page_user).count()
+        context["follower"] = Follow.objects.filter(following=page_user).count()
+
+        if page_user != request_user:
+            is_following = Follow.objects.filter(follower=request_user).filter(
+                following=page_user
+            )
+            context["is_following"] = True if is_following else False
+
         return context
 
 
@@ -155,3 +165,68 @@ class EditProfileView(LoginRequiredMixin, SuccessMessageMixin, UpdateWithInlines
         if not self.user_passes_test(request):
             return redirect("user:home")
         return super().dispatch(request, *args, **kwargs)
+
+
+# Views for following
+@login_required
+def follow_view(request, **kwargs):
+    follower = CustomUser.objects.get(id=request.user.id)
+    following = CustomUser.objects.get(id=kwargs["id"])
+    if follower == following:
+        messages.warning(request, "Haha, you can't follow yourself!")
+    else:
+        follow = Follow.objects.get_or_create(follower=follower, following=following)
+    if follow:
+        messages.success(
+            request, "WooHoo! You have now followed {}".format(following.username)
+        )
+    else:
+        messages.warning(
+            request, "Seems like you're already following {}".format(following.username)
+        )
+    return redirect("user:user_profile", pk=following.id)
+
+
+@login_required
+def unfollow_view(request, **kwargs):
+    follower = CustomUser.objects.get(id=request.user.id)
+    following = CustomUser.objects.get(id=kwargs["id"])
+    if follower == following:
+        messages.warning(request, "Haha, you can't follow yourself!")
+    else:
+        unfollow = Follow.objects.get(follower=follower, following=following)
+        unfollow.delete()
+        messages.success(request, "You have unfollowed {}".format(following.username))
+    return redirect("user:user_profile", pk=following.id)
+
+
+class FollowerListView(ListView):
+    model = Follow
+    template_name = "user/follow/followers.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowerListView, self).get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, username=self.kwargs["username"])
+        request_user = self.request.user
+        context["request_user"] = request_user
+        context["page_user"] = page_user
+        context["following"] = Follow.objects.filter(follower=page_user)
+        context["followers"] = Follow.objects.filter(following=page_user)
+        context["followed"] = Follow.objects.filter(follower=request_user)
+        return context
+
+
+class FollowingListView(ListView):
+    model = Follow
+    template_name = "user/follow/following.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowingListView, self).get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, username=self.kwargs["username"])
+        request_user = self.request.user
+        context["request_user"] = request_user
+        context["page_user"] = page_user
+        context["following"] = Follow.objects.filter(follower=page_user)
+        context["followers"] = Follow.objects.filter(following=page_user)
+        context["followed"] = Follow.objects.filter(follower=request_user)
+        return context

@@ -28,7 +28,20 @@ urlpatterns = [
         views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path("unauthenticated/", views.user_unauthenticated_view, name="unauthenticated"),
     path("home/", views.HomeView.as_view(), name="home"),
-    path("<int:pk>/", views.ProfileView.as_view(), name="user_profile"),
-    path("<int:pk>/edit/", views.EditProfileView.as_view(), name="edit_profile"),
+    path("<int:pk>/", views.UserProfileView.as_view(), name="user_profile"),
+    path("tweet/", views.TweetView.as_view(), name="tweet"),
+    path("tweet/<int:pk>/edit/", views.TweetEditView.as_view(), name="tweet_edit"),
+    path(
+        "tweet/<int:pk>/delete/", views.TweetDeleteView.as_view(), name="tweet_delete"
+    ),
+    path("<int:id>/follow", views.follow_view, name="follow"),
+    path("<int:id>/unfollow", views.unfollow_view, name="unfollow"),
+    path(
+        "<slug:username>/followers", views.FollowerListView.as_view(), name="followers"
+    ),
+    path(
+        "<slug:username>/following", views.FollowingListView.as_view(), name="following"
+    ),
 ]
