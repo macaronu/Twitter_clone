@@ -56,29 +56,29 @@ def signup_thanks_view(request):
     return render(request, 'user/signup/thanks.html')
 
 # Views for signing in
-class signin_view(LoginView):
+class SigninView(LoginView):
     template_name = 'user/signin.html'
     next_page = 'user:home'
 
 # Views for signing out
-class signout_view(LogoutView):
+class SignoutView(LogoutView):
     template_name = 'user/signedout.html'
 
 # Views for resetting password
 
-class password_reset_view(PasswordResetView):
+class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
     success_url = reverse_lazy('user:password_reset_done')
     email_template_name = "user/password_reset/password_reset_email.html"
 
-class password_reset_done_view(PasswordResetDoneView):
+class PasswordResetDoneView(PasswordResetDoneView):
     template_name = "user/password_reset/password_reset_done.html"
 
-class password_reset_confirm_view(PasswordResetConfirmView):
+class PasswordResetConfirmView(PasswordResetConfirmView):
     success_url = reverse_lazy('user:password_reset_complete')
     template_name = "user/password_reset/password_reset_confirm.html"
 
-class password_reset_complete_view(PasswordResetCompleteView):
+class PasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
 
 # Views for users
