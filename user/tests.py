@@ -1,3 +1,4 @@
+from django.contrib.auth import SESSION_KEY
 from django.shortcuts import reverse
 from django.test import TestCase
 
@@ -22,7 +23,7 @@ class CreateUserFormTests(TestCase):
         self.assertEqual(form.errors["email"], ["This field is required."])
 
 
-class HomeViewTests(TestCase):
+class SignupViewTests(TestCase):
     def test_get_signup_view(self):
         # GET method returns status code 200
         response = self.client.get(reverse('user:signup'))
@@ -246,3 +247,74 @@ class InvalidSignupTests(TestCase):
         response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertFormError(response, 'form', 'password2', "The two password fields didn’t match.")
         self.assertEquals(response.status_code, 200)
+
+
+class SigninTests(TestCase):
+    def setUp(self):
+        user = CustomUser.objects.create(
+            username="test",
+            email="test@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        user.set_password('12345')
+        user.save()
+    
+    def test_get_signin_view(self):
+        response = self.client.get(reverse('user:signin'))
+        self.assertEquals(response.status_code, 200)
+    
+    def test_valid_signin(self):
+        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':'12345'})
+        self.assertEquals(response.status_code, 302)
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertRedirects(response, reverse('user:home'))
+    
+    def test_nonexistent_user_signin(self):
+        response = self.client.post(reverse('user:signin'), {'username':'LeonardoDaVinci', 'password':'12345'})
+        self.assertEquals(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+        self.assertFormError(response, 'form', '__all__', 'Please enter a correct username and password. Note that both fields may be case-sensitive.')
+
+    def test_null_password_signin(self):
+        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':''})
+        self.assertEquals(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+        self.assertFormError(response, 'form', 'password', 'This field is required.')
+    
+    def test_invalid_password_signin(self):
+        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':'23456'})
+        self.assertEquals(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+        self.assertFormError(response, 'form', '__all__', 'Please enter a correct username and password. Note that both fields may be case-sensitive.')
+    
+    def test_signout(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:home'))
+        self.assertEquals(response.status_code, 200)
+        response = self.client.get(reverse('user:signout'))
+        self.assertEquals(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+
+class AuthenticatedViewTests(TestCase):
+    def setUp(self):
+        user = CustomUser.objects.create(
+            username="test",
+            email="test@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        user.set_password('12345')
+        user.save()
+    
+    def test_authenticated_get_home_view(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:home'))
+        self.assertEquals(response.status_code, 200)
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_unauthenticated_get_home_view(self):
+        response = self.client.get(reverse('user:home'))
+        self.assertEquals(response.status_code, 200)
+        self.assertNotIn(SESSION_KEY, self.client.session)
