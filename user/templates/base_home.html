@@ -1,0 +1,17 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+        <div class="sidenav">
+            <a href="{% url 'user:home'%}"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Home_Icon_by_Lakas.svg/1200px-Home_Icon_by_Lakas.svg.png"></a>
+            <a href="{% url 'user:user_profile' pk=user.pk %}"><img src="https://freesvg.org/img/abstract-user-flat-4.png"></a>
+            <a href="{% url 'user:tweet' %}"><img src="https://cdn0.iconfinder.com/data/icons/round-ui-icons/512/add_blue.png" style="width: 60px;"></a>
+        </div>
+        <div class="main">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>
