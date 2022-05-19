@@ -20,13 +20,18 @@
         {% endif %}
     </header>
     <div class="profile">
-        <img style="margin-top: 80px; margin-right: 1rem; float: left; width: 70px; height: 70px;" src='https://freesvg.org/img/abstract-user-flat-4.png'>
+            <img class="prof-icon-lg" src="{{ page_user.profile_img_url }}">
         <h1 style="padding-top: 50px; font-size: 50px;  float: left;">{{ page_user }}</h1>
         <div class="btn_field">
             {% if user.id == page_user.id %}
-                <a class="white-btn prof-foot" href="{% url 'user:signout' %}">Sign out</a>
+                <a class="white-btn prof-foot" href="{% url 'user:edit_profile' pk=user.pk %}">Edit</a>
             {% endif %}
         </div>
+        {% if page_user.bio %}
+        </br></br>
+        <div class="bio">{{ page_user.bio }}</div>
+        {% endif %}
+        <div class="bio note">Joined at: {{ page_user.created_at }}</div>
         <div class="follow-count">
             <a href="#"><ul> Following</ul></a>
             <a href="#"><ul> Followers</ul></a>

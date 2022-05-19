@@ -152,9 +152,8 @@ ul {
 .profile {
   border-bottom: 1px solid;
   border-bottom-color: #c5c5c5;
-  height: 270px;
   width: 70%;
-  padding-bottom: 1rem;
+  min-height: fit-content;
 }
 
 .prof-foot {
@@ -175,9 +174,16 @@ ul {
   clear: both;
   display: flex;
   font-weight: bold;
+  padding-top: 10px;
 }
 .follow-count ul {
   float: left;
+}
+
+.bio{
+  float:left;
+  padding: 10px;
+  clear: both;
 }
 
 .tweet {
@@ -219,6 +225,15 @@ ul {
 .prof-name:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.prof-icon-lg {
+  margin-top: 80px; 
+  margin-right: 2rem; 
+  float: left; 
+  width: 70px; 
+  height: 70px;
+  border-radius: 80px;
 }
 
 .material-icon {

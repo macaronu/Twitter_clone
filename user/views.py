@@ -1,8 +1,12 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.shortcuts import render, redirect
+from django.views.generic import DetailView, ListView, UpdateView
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
+from .models import CustomUser
 from .forms import SignupForm, PasswordForm
 
 # Views for signing up
@@ -82,5 +86,40 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
 
 # Views for users
+def user_unauthenticated_view(request):
+    return render(request, 'user/user_unauthenticated.html')
+
+@login_required
 def home_view(request):
     return render(request, 'user/home.html')
+
+class UserProfileView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'user/profile/user_profile.html'
+    def get_context_data(self, **kwargs):
+        context = super(UserProfileView, self).get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, id=self.kwargs['pk'])
+        request_user = self.request.user
+        context['request_user']= request_user
+        context['page_user']= page_user
+        return context
+
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    model = CustomUser
+    template_name = 'user/profile/edit_profile.html'
+    fields = ['username', 'profile_img', 'bio']
+    
+    def get_success_url(self):
+        pk = self.kwargs["pk"]
+        return reverse_lazy("user:user_profile", kwargs={"pk": pk})
+
+    def user_passes_test(self, request):
+        if request.user.is_authenticated:
+            self.object = self.get_object()
+            return self.object == request.user
+        return False
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.user_passes_test(request):
+            return redirect('user:home')
+        return super(EditProfileView, self).dispatch(request, *args, **kwargs)
