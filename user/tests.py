@@ -1,4 +1,5 @@
 from django.contrib.auth import SESSION_KEY
+from django.core.files.images import ImageFile
 from django.shortcuts import reverse
 from django.test import TestCase
 
@@ -297,24 +298,153 @@ class SigninTests(TestCase):
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
-class AuthenticatedViewTests(TestCase):
+class GetViewTests(TestCase):
     def setUp(self):
-        user = CustomUser.objects.create(
+        self.user = CustomUser.objects.create(
             username="test",
             email="test@test.com",
             phone= '',
             date_of_birth= '1901-01-01'
         )
-        user.set_password('12345')
-        user.save()
+        self.user.set_password('12345')
+        self.user.save()
+
+        self.another_user = CustomUser.objects.create(
+            username="test2",
+            email="test2@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        self.another_user.set_password('12345')
+        self.another_user.save()
     
     def test_authenticated_get_home_view(self):
         self.client.login(username="test", password="12345")
         response = self.client.get(reverse('user:home'))
         self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/home.html')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_unauthenticated_get_home_view(self):
         response = self.client.get(reverse('user:home'))
-        self.assertEquals(response.status_code, 200)
+        redirect_url = reverse('user:signin')+'?next='+ reverse('user:home')
+        self.assertRedirects(response, redirect_url, status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
+    
+    # Get tests for user profile views
+    def test_authenticated_get_my_user_profile_view(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.user.id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/profile/user_profile.html')
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_unauthenticated_get_my_user_profile_view(self):
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.user.id}))
+        redirect_url = reverse('user:signin')+'?next='+ reverse('user:user_profile', kwargs={'pk':self.user.id})
+        self.assertRedirects(response, redirect_url, status_code=302)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+    
+    def test_authenticated_get_another_users_profile_view(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.another_user.id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/profile/user_profile.html')
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_unauthenticated_get_another_users_profile_view(self):
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.another_user.id}))
+        redirect_url = reverse('user:signin')+'?next='+ reverse('user:user_profile', kwargs={'pk':self.another_user.id})
+        self.assertRedirects(response, redirect_url, status_code=302)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    #  Get tests for profile editing views
+    def test_authenticated_get_my_edit_profile_view(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.user.id}))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/profile/edit_profile.html')
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_unauthenticated_get_my_edit_profile_view(self):
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.user.id}))
+        self.assertRedirects(response, reverse('user:home'), status_code=302, target_status_code=302)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+    
+    def test_authenticated_get_another_users_edit_profile_view(self):
+        self.client.login(username="test", password="12345")
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.another_user.id}))
+        self.assertRedirects(response, reverse('user:home'), status_code=302)
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_unauthenticated_get_another_users_edit_profile_view(self):
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.another_user.id}))
+        self.assertRedirects(response, reverse('user:home'), status_code=302, target_status_code=302)
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+class EditProfileTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="test",
+            email="test@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        self.user.set_password('12345')
+        self.user.save()
+
+        self.another_user = CustomUser.objects.create(
+            username="test2",
+            email="test2@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        self.another_user.set_password('12345')
+        self.another_user.save()
+
+    def test_valid_username_and_bio_edit(self):
+        self.client.login(username="test", password="12345")
+        url = reverse('user:edit_profile', kwargs={'pk':self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk':self.user.id})
+        context = {'username':'teste', 'bio':'now testing'}
+        response = self.client.post(url, context)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'teste')
+        self.assertEqual(self.user.bio, 'now testing')
+        self.assertIn(SESSION_KEY, self.client.session)
+    
+    # Make sure to delete /user_1/test_img.jpg every time you test this
+    def valid_img_edit(self):
+        self.client.login(username="test", password="12345")
+        url = reverse('user:edit_profile', kwargs={'pk':self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk':self.user.id})
+        path = './media/test/test_img.jpg'
+        context = {'username': 'test', 'profile_img': ImageFile(open(path, 'rb'))}
+        response = self.client.post(url, context)
+        self.user.refresh_from_db()
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertEqual(self.user.profile_img.name, 'profile/images/user_{0}/test_img.jpg'.format(self.user.id))
+        self.assertIn(SESSION_KEY, self.client.session)
+    
+    def test_nonexistent_profile_edit(self):
+        self.client.login(username="test", password="12345")
+        url = reverse('user:edit_profile', kwargs={'pk':5})
+        context = {'username':'teste', 'bio':'now testing'}
+        response = self.client.post(url, context)
+        self.assertEqual(response.status_code, 404)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'test')
+        self.assertEqual(self.user.bio, None)
+        self.assertIn(SESSION_KEY, self.client.session)
+    
+    def test_another_users_profile_edit(self):
+        self.client.login(username="test", password="12345")
+        url = reverse('user:edit_profile', kwargs={'pk':self.another_user.id})
+        context = {'username':'teste', 'bio':'now testing'}
+        response = self.client.post(url, context)
+        self.assertRedirects(response, reverse('user:home'), status_code=302)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'test')
+        self.assertEqual(self.user.bio, None)
+        self.assertIn(SESSION_KEY, self.client.session)

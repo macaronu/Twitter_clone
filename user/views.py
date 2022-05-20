@@ -96,6 +96,7 @@ def home_view(request):
 class UserProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'user/profile/user_profile.html'
+    permission_denied_message = "Oops! Seems like you haven't signed in yet."
     def get_context_data(self, **kwargs):
         context = super(UserProfileView, self).get_context_data(**kwargs)
         page_user = get_object_or_404(CustomUser, id=self.kwargs['pk'])
@@ -108,7 +109,9 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser
     template_name = 'user/profile/edit_profile.html'
     fields = ['username', 'profile_img', 'bio']
+    permission_denied_message = "Oops! Seems like you haven't signed in yet."
     
+    # Redirect to user's profile page with kwargs on success
     def get_success_url(self):
         pk = self.kwargs["pk"]
         return reverse_lazy("user:user_profile", kwargs={"pk": pk})
@@ -118,7 +121,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
             self.object = self.get_object()
             return self.object == request.user
         return False
-
+    # Users cannot access other people's edit pages
     def dispatch(self, request, *args, **kwargs):
         if not self.user_passes_test(request):
             return redirect('user:home')
