@@ -1,8 +1,7 @@
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, UpdateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
@@ -10,9 +9,9 @@ from .models import CustomUser
 from .forms import SignupForm, PasswordForm
 
 # Views for signing up
-
 def index_view(request):
     return render(request, 'user/index.html')
+
 
 def signup_view(request):
     if request.method == "POST":
@@ -23,7 +22,8 @@ def signup_view(request):
     else:
         session_form_data = request.session.get('info_form_data')
         form = SignupForm(session_form_data)
-    return render(request, 'user/signup/signup.html', {'form':form})
+    return render(request, 'user/signup/signup.html', {'form': form})
+
 
 def password_view(request):
     session_form_data = request.session.get('info_form_data')
@@ -38,7 +38,8 @@ def password_view(request):
             return redirect('user:confirm')
     else:
         form = PasswordForm(session_form_data)
-    return render(request, 'user/signup/password.html', {'form':form})
+    return render(request, 'user/signup/password.html', {'form': form})
+
 
 def signup_confirm_view(request):
     session_form_data = request.session.get('password_form_data')
@@ -54,7 +55,8 @@ def signup_confirm_view(request):
             return redirect('user:thanks')
     else:
         form = PasswordForm(session_form_data)
-    return render(request, 'user/signup/signupConfirm.html', {'form':form})
+    return render(request, 'user/signup/signupConfirm.html', {'form': form})
+
 
 def signup_thanks_view(request):
     return render(request, 'user/signup/thanks.html')
@@ -69,18 +71,20 @@ class SignoutView(LogoutView):
     template_name = 'user/signedout.html'
 
 # Views for resetting password
-
 class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
     success_url = reverse_lazy('user:password_reset_done')
     email_template_name = "user/password_reset/password_reset_email.html"
 
+
 class PasswordResetDoneView(PasswordResetDoneView):
     template_name = "user/password_reset/password_reset_done.html"
+
 
 class PasswordResetConfirmView(PasswordResetConfirmView):
     success_url = reverse_lazy('user:password_reset_complete')
     template_name = "user/password_reset/password_reset_confirm.html"
+
 
 class PasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
@@ -89,21 +93,24 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
 def user_unauthenticated_view(request):
     return render(request, 'user/user_unauthenticated.html')
 
+
 @login_required
 def home_view(request):
     return render(request, 'user/home.html')
+
 
 class UserProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'user/profile/user_profile.html'
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
     def get_context_data(self, **kwargs):
-        context = super(UserProfileView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         page_user = get_object_or_404(CustomUser, id=self.kwargs['pk'])
         request_user = self.request.user
         context['request_user']= request_user
         context['page_user']= page_user
         return context
+
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser
@@ -125,4 +132,4 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         if not self.user_passes_test(request):
             return redirect('user:home')
-        return super(EditProfileView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

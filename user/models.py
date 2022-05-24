@@ -2,8 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 def directory_path(instance, filename):
-    return 'profile/images/user_{0}/{1}'.format(instance.id, filename)
+    return f'profile/images/user_{instance.id}/{filename}'
+
 
 class CustomUser(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)

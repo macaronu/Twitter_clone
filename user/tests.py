@@ -214,7 +214,7 @@ class InvalidSignupTests(TestCase):
         self.assertFormError(response, 'form', 'email', 'Enter a valid email address.')
         self.assertEquals(response.status_code, 200)
     
-    def test_invalid_password(self):
+    def test_common_invalid_password(self):
         # Short or similar passwords are invalid.
         self.valid_password_data['password1'] = 'test'
         self.valid_password_data['password2'] = 'test'
@@ -223,11 +223,11 @@ class InvalidSignupTests(TestCase):
         session.save()
         response = self.client.post(reverse('user:create_password'), self.valid_password_data)
         self.assertFormError(response, 'form', 'password2', 'This password is too short. It must contain at least 8 characters.')
-        self.assertFormError(response, 'form', 'password2', 'The password is too similar to the email.')
+        self.assertFormError(response, 'form', 'password2', 'This password is too common.')
         self.assertFormError(response, 'form', 'password2', 'The password is too similar to the username.')
         self.assertEquals(response.status_code, 200)
 
-    def test_invalid_password(self):
+    def test_numeric_invalid_password(self):
         # Passwords with only numbers are invalid.
         self.valid_password_data['password1'] = '12345678'
         self.valid_password_data['password2'] = '12345678'
@@ -260,35 +260,49 @@ class SigninTests(TestCase):
         )
         user.set_password('12345')
         user.save()
+
+        self.signin_url = reverse('user:signin')
     
     def test_get_signin_view(self):
-        response = self.client.get(reverse('user:signin'))
+        response = self.client.get(self.signin_url)
         self.assertEquals(response.status_code, 200)
     
     def test_valid_signin(self):
-        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':'12345'})
+        response = self.client.post(self.signin_url, {'username': 'test', 'password': '12345'})
         self.assertEquals(response.status_code, 302)
         self.assertIn(SESSION_KEY, self.client.session)
         self.assertRedirects(response, reverse('user:home'))
     
     def test_nonexistent_user_signin(self):
-        response = self.client.post(reverse('user:signin'), {'username':'LeonardoDaVinci', 'password':'12345'})
+        response = self.client.post(self.signin_url, {'username': 'LeonardoDaVinci', 'password': '12345'})
         self.assertEquals(response.status_code, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
         self.assertFormError(response, 'form', '__all__', 'Please enter a correct username and password. Note that both fields may be case-sensitive.')
 
     def test_null_password_signin(self):
-        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':''})
+        response = self.client.post(self.signin_url, {'username': 'test', 'password': ''})
         self.assertEquals(response.status_code, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
         self.assertFormError(response, 'form', 'password', 'This field is required.')
     
     def test_invalid_password_signin(self):
-        response = self.client.post(reverse('user:signin'), {'username':'test', 'password':'23456'})
+        response = self.client.post(self.signin_url, {'username': 'test', 'password': '23456'})
         self.assertEquals(response.status_code, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
         self.assertFormError(response, 'form', '__all__', 'Please enter a correct username and password. Note that both fields may be case-sensitive.')
-    
+
+
+class SignoutTests(TestCase):
+    def setUp(self):
+        user = CustomUser.objects.create(
+            username="test",
+            email="test@test.com",
+            phone= '',
+            date_of_birth= '1901-01-01'
+        )
+        user.set_password('12345')
+        user.save()
+
     def test_signout(self):
         self.client.login(username="test", password="12345")
         response = self.client.get(reverse('user:home'))
@@ -317,6 +331,8 @@ class GetViewTests(TestCase):
         )
         self.another_user.set_password('12345')
         self.another_user.save()
+
+        self.signin_url = reverse('user:signin')
     
     def test_authenticated_get_home_view(self):
         self.client.login(username="test", password="12345")
@@ -327,60 +343,61 @@ class GetViewTests(TestCase):
 
     def test_unauthenticated_get_home_view(self):
         response = self.client.get(reverse('user:home'))
-        redirect_url = reverse('user:signin')+'?next='+ reverse('user:home')
+        redirect_url = self.signin_url + '?next=' + reverse('user:home')
         self.assertRedirects(response, redirect_url, status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
     
     # Get tests for user profile views
     def test_authenticated_get_my_user_profile_view(self):
         self.client.login(username="test", password="12345")
-        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.user.id}))
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk': self.user.id}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'user/profile/user_profile.html')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_unauthenticated_get_my_user_profile_view(self):
-        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.user.id}))
-        redirect_url = reverse('user:signin')+'?next='+ reverse('user:user_profile', kwargs={'pk':self.user.id})
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk': self.user.id}))
+        redirect_url = self.signin_url + '?next=' + reverse('user:user_profile', kwargs={'pk': self.user.id})
         self.assertRedirects(response, redirect_url, status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
     
     def test_authenticated_get_another_users_profile_view(self):
         self.client.login(username="test", password="12345")
-        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.another_user.id}))
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk': self.another_user.id}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'user/profile/user_profile.html')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_unauthenticated_get_another_users_profile_view(self):
-        response = self.client.get(reverse('user:user_profile', kwargs={'pk':self.another_user.id}))
-        redirect_url = reverse('user:signin')+'?next='+ reverse('user:user_profile', kwargs={'pk':self.another_user.id})
+        response = self.client.get(reverse('user:user_profile', kwargs={'pk': self.another_user.id}))
+        redirect_url = self.signin_url + '?next=' + reverse('user:user_profile', kwargs={'pk': self.another_user.id})
         self.assertRedirects(response, redirect_url, status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
     #  Get tests for profile editing views
     def test_authenticated_get_my_edit_profile_view(self):
         self.client.login(username="test", password="12345")
-        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.user.id}))
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk': self.user.id}))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'user/profile/edit_profile.html')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_unauthenticated_get_my_edit_profile_view(self):
-        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.user.id}))
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk': self.user.id}))
         self.assertRedirects(response, reverse('user:home'), status_code=302, target_status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
     
     def test_authenticated_get_another_users_edit_profile_view(self):
         self.client.login(username="test", password="12345")
-        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.another_user.id}))
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk': self.another_user.id}))
         self.assertRedirects(response, reverse('user:home'), status_code=302)
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_unauthenticated_get_another_users_edit_profile_view(self):
-        response = self.client.get(reverse('user:edit_profile', kwargs={'pk':self.another_user.id}))
+        response = self.client.get(reverse('user:edit_profile', kwargs={'pk': self.another_user.id}))
         self.assertRedirects(response, reverse('user:home'), status_code=302, target_status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
+
 
 class EditProfileTests(TestCase):
     def setUp(self):
@@ -401,12 +418,12 @@ class EditProfileTests(TestCase):
         )
         self.another_user.set_password('12345')
         self.another_user.save()
+        self.client.login(username="test", password="12345")
 
     def test_valid_username_and_bio_edit(self):
-        self.client.login(username="test", password="12345")
-        url = reverse('user:edit_profile', kwargs={'pk':self.user.id})
-        redirect_url = reverse('user:user_profile', kwargs={'pk':self.user.id})
-        context = {'username':'teste', 'bio':'now testing'}
+        url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
+        context = {'username': 'teste', 'bio': 'now testing'}
         response = self.client.post(url, context)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.user.refresh_from_db()
@@ -415,22 +432,56 @@ class EditProfileTests(TestCase):
         self.assertIn(SESSION_KEY, self.client.session)
     
     # Make sure to delete /user_1/test_img.jpg every time you test this
-    def valid_img_edit(self):
-        self.client.login(username="test", password="12345")
-        url = reverse('user:edit_profile', kwargs={'pk':self.user.id})
-        redirect_url = reverse('user:user_profile', kwargs={'pk':self.user.id})
+    def test_valid_img_edit(self):
+        url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
         path = './media/test/test_img.jpg'
         context = {'username': 'test', 'profile_img': ImageFile(open(path, 'rb'))}
         response = self.client.post(url, context)
         self.user.refresh_from_db()
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-        self.assertEqual(self.user.profile_img.name, 'profile/images/user_{0}/test_img.jpg'.format(self.user.id))
+        self.assertEqual(self.user.profile_img.name, f'profile/images/user_{self.user.id}/test_img.jpg')
         self.assertIn(SESSION_KEY, self.client.session)
-    
+
+    def test_invalid_img_edit_with_pdf(self):
+        url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
+        path = './media/test/test_pdf.pdf'
+        context = {'username': 'test', 'profile_img': ImageFile(open(path, 'rb'))}
+        response = self.client.post(url, context)
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
+        self.assertEqual(self.user.profile_img.name, '')
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_invalid_img_edit_with_txt(self):
+        url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
+        path = './media/test/test_corr.jpg'
+        context = {'username': 'test', 'profile_img': ImageFile(open(path, 'rb'))}
+        response = self.client.post(url, context)
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
+        self.assertEqual(self.user.profile_img.name, '')
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_invalid_img_edit_with_pdf(self):
+        url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
+        path = './media/test/test_txt.txt'
+        context = {'username': 'test', 'profile_img': ImageFile(open(path, 'rb'))}
+        response = self.client.post(url, context)
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
+        self.assertEqual(self.user.profile_img.name, '')
+        self.assertIn(SESSION_KEY, self.client.session)
+
     def test_nonexistent_profile_edit(self):
-        self.client.login(username="test", password="12345")
-        url = reverse('user:edit_profile', kwargs={'pk':5})
-        context = {'username':'teste', 'bio':'now testing'}
+        url = reverse('user:edit_profile', kwargs={'pk': 5})
+        context = {'username': 'teste', 'bio': 'now testing'}
         response = self.client.post(url, context)
         self.assertEqual(response.status_code, 404)
         self.user.refresh_from_db()
@@ -439,9 +490,8 @@ class EditProfileTests(TestCase):
         self.assertIn(SESSION_KEY, self.client.session)
     
     def test_another_users_profile_edit(self):
-        self.client.login(username="test", password="12345")
-        url = reverse('user:edit_profile', kwargs={'pk':self.another_user.id})
-        context = {'username':'teste', 'bio':'now testing'}
+        url = reverse('user:edit_profile', kwargs={'pk': self.another_user.id})
+        context = {'username': 'teste', 'bio': 'now testing'}
         response = self.client.post(url, context)
         self.assertRedirects(response, reverse('user:home'), status_code=302)
         self.user.refresh_from_db()

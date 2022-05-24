@@ -134,8 +134,8 @@ LOGIN_URL = 'user:signin'
 
 # Email backend
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = str(BASE_DIR.joinpath('sent_emails'))
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 # Image backend
-MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
+MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
