@@ -9,6 +9,8 @@ from .models import CustomUser
 from .forms import SignupForm, PasswordForm
 
 # Views for signing up
+
+
 def index_view(request):
     return render(request, 'user/index.html')
 
@@ -45,7 +47,7 @@ def signup_confirm_view(request):
     session_form_data = request.session.get('password_form_data')
     if session_form_data is None:
         return redirect('user:signup')
-    
+
     if request.method == "POST":
         form = PasswordForm(request.POST)
         if form.is_valid():
@@ -62,15 +64,21 @@ def signup_thanks_view(request):
     return render(request, 'user/signup/thanks.html')
 
 # Views for signing in
+
+
 class SigninView(LoginView):
     template_name = 'user/signin.html'
     next_page = 'user:home'
 
 # Views for signing out
+
+
 class SignoutView(LogoutView):
     template_name = 'user/signedout.html'
 
 # Views for resetting password
+
+
 class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
     success_url = reverse_lazy('user:password_reset_done')
@@ -90,6 +98,8 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
 
 # Views for users
+
+
 def user_unauthenticated_view(request):
     return render(request, 'user/user_unauthenticated.html')
 
@@ -103,12 +113,13 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'user/profile/user_profile.html'
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         page_user = get_object_or_404(CustomUser, id=self.kwargs['pk'])
         request_user = self.request.user
-        context['request_user']= request_user
-        context['page_user']= page_user
+        context['request_user'] = request_user
+        context['page_user'] = page_user
         return context
 
 
@@ -117,7 +128,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
     template_name = 'user/profile/edit_profile.html'
     fields = ['username', 'profile_img', 'bio']
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
-    
+
     # Redirect to user's profile page with kwargs on success
     def get_success_url(self):
         pk = self.kwargs["pk"]
@@ -128,7 +139,9 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
             self.object = self.get_object()
             return self.object == request.user
         return False
+
     # Users cannot access other people's edit pages
+
     def dispatch(self, request, *args, **kwargs):
         if not self.user_passes_test(request):
             return redirect('user:home')

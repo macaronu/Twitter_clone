@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
     profile_img = models.ImageField(upload_to=directory_path, blank=True)
     bio = models.TextField(max_length=280, null=True, blank=True)
     REQUIRED_FIELDS = ["date_of_birth"]
-    
+
     @property
     def profile_img_url(self):
         if self.profile_img:

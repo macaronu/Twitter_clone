@@ -15,7 +15,7 @@ db.sqlite3
 /static/
 
 # media
-media/
+media/profile/
 sent_emails/
 
 # macOS
