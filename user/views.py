@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.views.generic import DetailView, UpdateView
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
 from .models import CustomUser
@@ -113,14 +113,7 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'user/profile/user_profile.html'
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        page_user = get_object_or_404(CustomUser, id=self.kwargs['pk'])
-        request_user = self.request.user
-        context['request_user'] = request_user
-        context['page_user'] = page_user
-        return context
+    context_object_name = 'page_user'
 
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
