@@ -8,9 +8,8 @@ from django.urls import reverse_lazy
 from .models import CustomUser
 from .forms import SignupForm, PasswordForm
 
+
 # Views for signing up
-
-
 def index_view(request):
     return render(request, 'user/index.html')
 
@@ -63,22 +62,19 @@ def signup_confirm_view(request):
 def signup_thanks_view(request):
     return render(request, 'user/signup/thanks.html')
 
+
 # Views for signing in
-
-
 class SigninView(LoginView):
     template_name = 'user/signin.html'
     next_page = 'user:home'
 
+
 # Views for signing out
-
-
 class SignoutView(LogoutView):
     template_name = 'user/signedout.html'
 
+
 # Views for resetting password
-
-
 class PasswordResetView(PasswordResetView):
     template_name = "user/password_reset/password_reset_form.html"
     success_url = reverse_lazy('user:password_reset_done')
@@ -97,9 +93,8 @@ class PasswordResetConfirmView(PasswordResetConfirmView):
 class PasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "user/password_reset/password_reset_complete.html"
 
+
 # Views for users
-
-
 def user_unauthenticated_view(request):
     return render(request, 'user/user_unauthenticated.html')
 
@@ -134,7 +129,6 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return False
 
     # Users cannot access other people's edit pages
-
     def dispatch(self, request, *args, **kwargs):
         if not self.user_passes_test(request):
             return redirect('user:home')
