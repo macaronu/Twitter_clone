@@ -95,10 +95,6 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
 
 
 # Views for users
-def user_unauthenticated_view(request):
-    return render(request, 'user/user_unauthenticated.html')
-
-
 @login_required
 def home_view(request):
     return render(request, 'user/home.html')
