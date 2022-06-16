@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'phonenumber_field',
+    'extra_views',
     'user.apps.UserConfig',
     'django.contrib.admin',
     'django.contrib.auth',

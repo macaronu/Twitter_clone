@@ -13,9 +13,14 @@ class CustomUser(AbstractUser):
     email = models.EmailField(blank=False)
     phone = PhoneNumberField(blank=True)
     date_of_birth = models.DateField()
+    REQUIRED_FIELDS = ["date_of_birth"]
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, primary_key=True)
     profile_img = models.ImageField(upload_to=directory_path, blank=True)
     bio = models.TextField(max_length=280, null=True, blank=True)
-    REQUIRED_FIELDS = ["date_of_birth"]
 
     @property
     def profile_img_url(self):

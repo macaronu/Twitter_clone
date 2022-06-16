@@ -20,16 +20,22 @@
     <form method="post" novalidate style="padding-top: 60px;" enctype="multipart/form-data">
         {% csrf_token %}
         <div style="margin: 2rem;">
-          {% for field in form %}
-          {% if field.name == user.profile_img %}
-          <p>hey</p>
-            <img class="prof-icon-lg" src="{{ user.profile_img_url }}">
-          {% endif %}
-          <p>
-            <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-            {{ field }}
-          </p>
-          <ul>{{ field.errors }}</ul>
+          {{ form }}
+          {% for formset in inlines %}
+          {{ formset.management_form }}
+          {% for form in formset %}
+          <div>
+            <p style="clear:both;">
+              <label for="{{ form.bio.id_for_label }}">{{ form.bio.label_tag }}</label>
+              {{ form.bio }}
+            </p>
+            <p style="clear:both;">
+              <label for="{{ form.profile_img.id_for_label }}">{{ form.profile_img.label_tag }}</label>
+              {{ form.profile_img }}
+            </p>
+            <ul>{{ form.errors }}</ul>
+          </div>
+          {% endfor %}
           {% endfor %}
         </div>
         <input class="btn" type="submit" value="Save">

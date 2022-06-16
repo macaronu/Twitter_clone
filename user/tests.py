@@ -474,8 +474,9 @@ class EditProfileTests(TestCase):
         self.assertRedirects(response, redirect_url,
                              status_code=302, target_status_code=200)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(self.user.username, 'teste')
-        self.assertEqual(self.user.bio, 'now testing')
+        self.assertEqual(self.user.profile.bio, 'now testing')
         self.assertIn(SESSION_KEY, self.client.session)
 
     # Make sure to delete /user_1/test_img.jpg every time you test this
@@ -488,9 +489,10 @@ class EditProfileTests(TestCase):
                    'profile_img': ImageFile(open(path, 'rb'))}
         response = self.client.post(url, context)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertRedirects(response, redirect_url,
                              status_code=302, target_status_code=200)
-        self.assertEqual(self.user.profile_img.name,
+        self.assertEqual(self.user.proflie.profile_img.name,
                          f'profile/images/user_{self.user.id}/test_img.jpg')
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -501,10 +503,11 @@ class EditProfileTests(TestCase):
                    'profile_img': ImageFile(open(path, 'rb'))}
         response = self.client.post(url, context)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
-        self.assertEqual(self.user.profile_img.name, '')
+        self.assertEqual(self.user.profile.profile_img.name, '')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_invalid_img_edit_with_corr(self):
@@ -514,10 +517,11 @@ class EditProfileTests(TestCase):
                    'profile_img': ImageFile(open(path, 'rb'))}
         response = self.client.post(url, context)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
-        self.assertEqual(self.user.profile_img.name, '')
+        self.assertEqual(self.user.profile.profile_img.name, '')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_invalid_img_edit_with_txt(self):
@@ -527,10 +531,11 @@ class EditProfileTests(TestCase):
                    'profile_img': ImageFile(open(path, 'rb'))}
         response = self.client.post(url, context)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response, 'Upload a valid image. The file you uploaded was either not an image or a corrupted image.')
-        self.assertEqual(self.user.profile_img.name, '')
+        self.assertEqual(self.user.profile.profile_img.name, '')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_nonexistent_profile_edit(self):
@@ -539,8 +544,9 @@ class EditProfileTests(TestCase):
         response = self.client.post(url, context)
         self.assertEqual(response.status_code, 404)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(self.user.username, 'test')
-        self.assertEqual(self.user.bio, None)
+        self.assertEqual(self.user.profile.bio, None)
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_another_users_profile_edit(self):
@@ -549,6 +555,7 @@ class EditProfileTests(TestCase):
         response = self.client.post(url, context)
         self.assertRedirects(response, reverse('user:home'), status_code=302)
         self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
         self.assertEqual(self.user.username, 'test')
-        self.assertEqual(self.user.bio, None)
+        self.assertEqual(self.user.profile.bio, None)
         self.assertIn(SESSION_KEY, self.client.session)
