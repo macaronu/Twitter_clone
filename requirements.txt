@@ -2,3 +2,4 @@ Django==4.0.1
 django-phonenumber-field==6.0.0
 phonenumberslite==8.12.38
 Pillow==9.1.0
+django-extra-views

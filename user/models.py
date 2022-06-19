@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 def directory_path(instance, filename):
-    return f'profile/images/user_{instance.id}/{filename}'
+    return f'profile/images/user_{instance.user.id}/{filename}'
 
 
 class CustomUser(AbstractUser):

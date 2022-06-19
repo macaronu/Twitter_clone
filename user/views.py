@@ -2,10 +2,11 @@ from pickle import FALSE
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.forms import inlineformset_factory
 from django.views.generic import DetailView, UpdateView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from extra_views import UpdateWithInlinesView, InlineFormSetFactory
+from extra_views import UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin
 
 from .models import CustomUser, Profile
 from .forms import SignupForm, PasswordForm
@@ -109,42 +110,19 @@ class ProfileView(LoginRequiredMixin, DetailView):
     context_object_name = 'page_user'
 
 
-"""class EditProfileView(LoginRequiredMixin, UpdateView):
-    model = CustomUser
-    template_name = 'user/profile/edit_profile.html'
-    fields = ['username', 'profile_img', 'bio']
-    permission_denied_message = "Oops! Seems like you haven't signed in yet."
-
-    # Redirect to user's profile page with kwargs on success
-    def get_success_url(self):
-        pk = self.kwargs["pk"]
-        return reverse_lazy("user:user_profile", kwargs={"pk": pk})
-
-    def user_passes_test(self, request):
-        if request.user.is_authenticated:
-            self.object = self.get_object()
-            return self.object == request.user
-        return False
-
-    # Users cannot access other people's edit pages
-    def dispatch(self, request, *args, **kwargs):
-        if not self.user_passes_test(request):
-            return redirect('user:home')
-        return super().dispatch(request, *args, **kwargs)
-"""
-
-
 class ProfileInline(InlineFormSetFactory):
     model = Profile
     fields = ['profile_img', 'bio']
+    factory_kwargs = {'can_delete': False}
 
 
-class EditProfileView(UpdateWithInlinesView):
+class EditProfileView(LoginRequiredMixin, SuccessMessageMixin, UpdateWithInlinesView):
     model = CustomUser
     inlines = [ProfileInline]
     fields = ['username']
     template_name = 'user/profile/edit_profile.html'
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
+    success_message = 'Profile Updated!'
 
     # Redirect to user's profile page with kwargs on success
     def get_success_url(self):

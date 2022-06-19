@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm, SelectDateWidget
 
-from .models import CustomUser
+from .models import CustomUser, Profile
 
 
 class SignupForm(ModelForm):

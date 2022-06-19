@@ -465,14 +465,22 @@ class EditProfileTests(TestCase):
         self.another_user.save()
         self.client.login(username="test", password="12345")
 
+        self.context = {
+            'username': 'test',
+            'profile-TOTAL_FORMS': '1',
+            'profile-INITIAL_FORMS': '1',
+            'profile-MIN_NUM_FORMS': '0', 
+            'profile-MAX_NUM_FORMS': '1', 
+            'profile-0-user': self.user.id
+            }
+
     def test_valid_username_and_bio_edit(self):
         url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
-        redirect_url = reverse('user:user_profile',
-                               kwargs={'pk': self.user.id})
-        context = {'username': 'teste', 'bio': 'now testing'}
-        response = self.client.post(url, context)
-        self.assertRedirects(response, redirect_url,
-                             status_code=302, target_status_code=200)
+        redirect_url = reverse('user:user_profile', kwargs={'pk': self.user.id})
+        self.context['username'] = 'teste'
+        self.context['profile-0-bio']= 'now testing'
+        response = self.client.post(url, self.context)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.user.refresh_from_db()
         self.user.profile.refresh_from_db()
         self.assertEqual(self.user.username, 'teste')
@@ -485,24 +493,20 @@ class EditProfileTests(TestCase):
         redirect_url = reverse('user:user_profile',
                                kwargs={'pk': self.user.id})
         path = './media/test/test_img.jpg'
-        context = {'username': 'test',
-                   'profile_img': ImageFile(open(path, 'rb'))}
-        response = self.client.post(url, context)
-        self.user.refresh_from_db()
+        self.context['profile-0-profile_img']= ImageFile(open(path, 'rb'))
+        response = self.client.post(url, self.context)
         self.user.profile.refresh_from_db()
         self.assertRedirects(response, redirect_url,
                              status_code=302, target_status_code=200)
-        self.assertEqual(self.user.proflie.profile_img.name,
+        self.assertEqual(self.user.profile.profile_img.name,
                          f'profile/images/user_{self.user.id}/test_img.jpg')
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_invalid_img_edit_with_pdf(self):
         url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
         path = './media/test/test_pdf.pdf'
-        context = {'username': 'test',
-                   'profile_img': ImageFile(open(path, 'rb'))}
-        response = self.client.post(url, context)
-        self.user.refresh_from_db()
+        self.context['profile-0-profile_img']= ImageFile(open(path, 'rb'))
+        response = self.client.post(url, self.context)
         self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -513,10 +517,8 @@ class EditProfileTests(TestCase):
     def test_invalid_img_edit_with_corr(self):
         url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
         path = './media/test/test_corr.jpg'
-        context = {'username': 'test',
-                   'profile_img': ImageFile(open(path, 'rb'))}
-        response = self.client.post(url, context)
-        self.user.refresh_from_db()
+        self.context['profile-0-profile_img']= ImageFile(open(path, 'rb'))
+        response = self.client.post(url, self.context)
         self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -527,10 +529,8 @@ class EditProfileTests(TestCase):
     def test_invalid_img_edit_with_txt(self):
         url = reverse('user:edit_profile', kwargs={'pk': self.user.id})
         path = './media/test/test_txt.txt'
-        context = {'username': 'test',
-                   'profile_img': ImageFile(open(path, 'rb'))}
-        response = self.client.post(url, context)
-        self.user.refresh_from_db()
+        self.context['profile-0-profile_img']= ImageFile(open(path, 'rb'))
+        response = self.client.post(url, self.context)
         self.user.profile.refresh_from_db()
         self.assertEqual(response.status_code, 200)
         self.assertContains(
