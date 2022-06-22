@@ -1,0 +1,12 @@
+<html>
+  <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+  </head>
+  <body>
+    <h2>You are now signed out.</h2> 
+    <img src="https://c.tenor.com/bkSYOM6M9xEAAAAM/%E3%83%90%E3%82%A4%E3%83%90%E3%82%A4-%E6%89%8B%E3%82%92%E6%8C%AF%E3%82%8B.gif" style="width:320px; border-radius: 8px;">
+    <p>Wanna sign in again?</p>
+    <p><a class="blue-btn" href="{% url 'user:signin' %}">Sign in</a></p>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "base_home.html" %}
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+    {% block content %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %} 
+    <header>
+        <p style="padding: 10px; font-weight: bold;">{{ page_user.user }}</p>
+        {% if user.id == page_user.user.id %}
+        <a class="white-btn prof-head" href="{% url 'user:signout' %}">Sign out</a>
+        {% endif %}
+    </header>
+    <div class="profile">
+            <img class="prof-icon-lg" src="{{ page_user.profile.profile_img_url }}">
+        <h1 style="padding-top: 50px; font-size: 50px;  float: left;">{{ page_user }}</h1>
+        <div class="btn_field">
+            {% if user.id == page_user.id %}
+                <a class="white-btn prof-foot" href="{% url 'user:edit_profile' pk=user.pk %}">Edit</a>
+            {% endif %}
+        </div>
+        {% if page_user.profile.bio %}
+        </br></br>
+        <div class="bio">{{ page_user.profile.bio }}</div>
+        {% endif %}
+        <div class="bio note">Joined at: {{ page_user.created_at }}</div>
+        <div class="follow-count">
+            <a href="#"><ul> Following</ul></a>
+            <a href="#"><ul> Followers</ul></a>
+        </div>
+        <h3 style="clear: both; padding-top: 10px;">Tweets</h3>
+    </div>
+    {% if tweets %}
+    {% else %}
+        <p>No tweets yet...</p>
+    {% endif %}
+    {% endblock content %}
+    </body>
+</html>

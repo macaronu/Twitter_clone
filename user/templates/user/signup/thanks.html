@@ -1,0 +1,11 @@
+<html>
+  <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+  </head>
+  <body>
+    <h2>Thanks! Your account was successfully created.</h2> 
+    <img src="https://bunshun.jp/mwimgs/3/5/-/img_3559dc35450923ef809d434ea93a6154300659.jpg" style="width:320px; border-radius: 8px;">
+    <p><a class="blue-btn" href="{% url 'user:signin' %}">Sign in</a></p>
+  </body>
+</html>

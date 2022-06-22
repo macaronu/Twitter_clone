@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'phonenumber_field',
+    'extra_views',
     'user.apps.UserConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -130,3 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication
 AUTH_USER_MODEL = 'user.CustomUser'
+LOGIN_URL = 'user:signin'
+
+# Email backend
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+
+# Image backend
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'

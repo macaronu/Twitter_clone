@@ -1,0 +1,12 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+        <img src="https://www.userlike.com/api/proxy/resize/troll-chat-tips/troll.jpg?height=720" style="width:320px; border-radius: 8px;">
+        <h2>Oops! Access denied.</h2>
+        <p>Seems like you haven't signed in yet.</p>
+        <a class="white-btn" href="{% url 'user:signin' %}">Sign in</a>
+    </body>
+</html>

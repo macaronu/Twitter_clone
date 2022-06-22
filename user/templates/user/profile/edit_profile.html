@@ -1,0 +1,36 @@
+{% extends "base_home.html" %}
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+    {% block content %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    <header>
+        <p style="padding: 10px; font-weight: bold;">Edit profile</p>
+        <a class="white-btn prof-head" href="{% url 'user:user_profile' pk=user.pk %}">Back</a>
+    </header>
+    <form method="post" novalidate style="padding-top: 60px;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="margin: 2rem;">
+          {{ form }}
+          {% for formset in inlines %}
+          {{ formset.management_form }}
+          {% for form in formset %}
+          {{form.as_p}}
+          {{form.errors}}
+          {% endfor %}
+          {% endfor %}
+        </div>
+        <input class="btn" type="submit" value="Save">
+    </form>
+    {% endblock content %}
+    </body>
+</html>

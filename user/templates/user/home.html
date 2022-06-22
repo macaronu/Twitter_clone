@@ -1,0 +1,20 @@
+{% extends "base_home.html" %}
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+    {% block content %}
+        <header>
+            <p style="padding: 10px; font-weight: bold;">Home</p>
+            <a class="white-btn" style="margin-right:30%; margin-top: -70px; float: right;" href="{% url 'user:signout' %}">Sign out</a>
+        </header>
+        <div class="profile" style="margin-top: 50px;">
+            <h2 style="padding-top: 50px; font-size: 50px;">Hi, {{ user }}!</h1>
+            <h2>Welcome to your twitter account.</h2>
+            <a class="blue-btn" style="float:right; margin-top: -70px;" href="#">Tweet</a>
+        </div>
+    {% endblock content %}
+    </body>
+</html>
