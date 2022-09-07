@@ -13,7 +13,7 @@
         <div class="profile" style="margin-top: 50px;">
             <h2 style="padding-top: 50px; font-size: 50px;">Hi, {{ user }}!</h1>
             <h2>Welcome to your twitter account.</h2>
-            <a class="blue-btn" style="float:right; margin-top: -70px;" href="#">Tweet</a>
+            <a class="blue-btn" style="float:right; margin-top: -70px;" href="{% url 'tweets:tweet' %}">Tweet</a>
         </div>
         {% for tweet in object_list %}
         <article class="tweet">
@@ -27,19 +27,19 @@
                     </div>
                     <div>
                     {% if tweet.user.id == user.id %}
-                        <form method="POST" action="{% url 'user:tweet_delete' pk=tweet.pk %}">
+                        <form method="POST" action="{% url 'tweets:tweet_delete' pk=tweet.pk %}">
                         {% csrf_token %}
-                            <a href="{% url 'user:tweet_delete' pk=tweet.pk %}"><button style="all:unset; float:right" onclick="return confirm('Are you sure you want to delete this tweet?')">
+                            <a href="{% url 'tweets:tweet_delete' pk=tweet.pk %}"><button style="all:unset; float:right" onclick="return confirm('Are you sure you want to delete this tweet?')">
                                 <img class="material-icon" src='https://cdn-icons-png.flaticon.com/512/2891/2891491.png'>
                             </button></a>
                         </form>
-                        <a href="{% url 'user:tweet_edit' pk=tweet.pk %}">
+                        <a href="{% url 'tweets:tweet_edit' pk=tweet.pk %}">
                             <img class="material-icon" style="float:right" src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Edit_icon_%28the_Noun_Project_30184%29.svg/1024px-Edit_icon_%28the_Noun_Project_30184%29.svg.png'>
                         </a>
                     {%  endif %}
                     </div>
                 </div>
-                <a style="text-decoration: none;" href="{% url 'user:tweet_detail' username=tweet.user pk=tweet.pk %}">
+                <a style="text-decoration: none;" href="{% url 'tweets:tweet_detail' username=tweet.user pk=tweet.pk %}">
                     <div class="tweet-body">
                         <p>{{ tweet.body }}</p>
                         {% if tweet.image %}<img src='{{ tweet.image.url }}'>{% endif %}

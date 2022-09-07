@@ -28,7 +28,7 @@ urlpatterns = [
         views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("home/", views.home_view, name="home"),
+    path("home/", views.HomeView.as_view(), name="home"),
     path("<int:pk>/", views.ProfileView.as_view(), name="user_profile"),
     path("<int:pk>/edit/", views.EditProfileView.as_view(), name="edit_profile"),
 ]

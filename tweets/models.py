@@ -3,7 +3,7 @@ from django.urls import reverse
 
 
 def directory_path(instance, filename):
-    return f"profile/images/user_{instance.user.id}/{filename}"
+    return f"tweets/images/user_{instance.user.id}/{filename}"
 
 
 class Tweet(models.Model):

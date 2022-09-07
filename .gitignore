@@ -16,6 +16,7 @@ db.sqlite3
 
 # media
 media/profile/
+media/tweets/
 sent_emails/
 
 # macOS

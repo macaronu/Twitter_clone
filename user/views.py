@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     LoginView,
@@ -8,14 +7,15 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetCompleteView,
 )
-from django.shortcuts import render, redirect
-from django.views.generic import DetailView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import DetailView, ListView
 
 from django.urls import reverse_lazy
 from extra_views import UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin
 
 from .models import CustomUser, Profile
 from .forms import SignupForm, PasswordForm
+from tweets.models import Tweet
 
 
 # Views for signing up
@@ -104,9 +104,10 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
 
 
 # Views for users
-@login_required
-def home_view(request):
-    return render(request, "user/home.html")
+class HomeView(LoginRequiredMixin, ListView):
+    model = Tweet
+    template_name = "user/home.html"
+    permission_denied_message = "Oops! Seems like you haven't signed in yet."
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
@@ -114,6 +115,13 @@ class ProfileView(LoginRequiredMixin, DetailView):
     template_name = "user/profile/user_profile.html"
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
     context_object_name = "page_user"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, id=self.kwargs["pk"])
+        tweets = Tweet.objects.filter(user_id=page_user.id)
+        context["tweets"] = tweets
+        return context
 
 
 class ProfileInline(InlineFormSetFactory):

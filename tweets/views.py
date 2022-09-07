@@ -1,10 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView,
     DetailView,
-    ListView,
     UpdateView,
     DeleteView,
 )
@@ -14,9 +12,9 @@ from .models import Tweet
 
 
 # Views for tweeting
-class TweetView(LoginRequiredMixin, CreateView):
+class TweetCreateView(LoginRequiredMixin, CreateView):
     model = Tweet
-    template_name = "user/tweet.html"
+    template_name = "tweets/tweet.html"
     fields = ["user", "body", "image"]
     success_url = reverse_lazy("user:home")
 
@@ -27,7 +25,7 @@ class TweetView(LoginRequiredMixin, CreateView):
 
 class TweetEditView(LoginRequiredMixin, UpdateView):
     model = Tweet
-    template_name = "user/tweet_edit.html"
+    template_name = "tweets/tweet_edit.html"
     fields = ["body", "image"]
     success_url = reverse_lazy("user:home")
 
@@ -47,22 +45,4 @@ class TweetDeleteView(LoginRequiredMixin, DeleteView):
 
 class TweetDetailView(DetailView):
     model = Tweet
-    template_name = "user/tweet_detail.html"
-
-
-class HomeView(LoginRequiredMixin, ListView):
-    model = Tweet
-    template_name = "user/home.html"
-
-
-class UserProfileView(LoginRequiredMixin, DetailView):
-    model = "user.CustomUser"
-    template_name = "user/user_profile.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(UserProfileView, self).get_context_data(**kwargs)
-        page_user = get_object_or_404("user.CustomUser", id=self.kwargs["pk"])
-        tweets = Tweet.objects.filter(user_id=page_user.id)
-        context["page_user"] = page_user
-        context["tweets"] = tweets
-        return context
+    template_name = "tweets/tweet_detail.html"
