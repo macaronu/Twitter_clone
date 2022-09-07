@@ -13,7 +13,7 @@
         <div class="profile" style="margin-top: 50px;">
             <h2 style="padding-top: 50px; font-size: 50px;">Hi, {{ user }}!</h1>
             <h2>Welcome to your twitter account.</h2>
-            <a class="blue-btn" style="float:right; margin-top: -70px;" href="{% url 'user:tweet' %}">Tweet</a>
+            <a class="blue-btn" style="float:right; margin-top: -70px;" href="#">Tweet</a>
         </div>
         {% for tweet in object_list %}
         <article class="tweet">

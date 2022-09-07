@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser, Profile, Tweet
+from .models import CustomUser, Profile
 
 
 class CustomUserAdmin(UserAdmin):
@@ -27,4 +27,3 @@ class ExtendedUserAdmin(CustomUserAdmin):
 
 
 admin.site.register(CustomUser, ExtendedUserAdmin)
-admin.site.register(Tweet)

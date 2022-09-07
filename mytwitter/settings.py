@@ -30,9 +30,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Local
+    "user.apps.UserConfig",
+    "tweets.apps.TweetsConfig",
+    # Third Party
     "phonenumber_field",
     "extra_views",
-    "user.apps.UserConfig",
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

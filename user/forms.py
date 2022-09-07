@@ -1,9 +1,9 @@
 import datetime
 
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm, SelectDateWidget, Textarea
+from django.forms import ModelForm, SelectDateWidget
 
-from .models import CustomUser, Tweet
+from .models import CustomUser
 
 
 class SignupForm(ModelForm):
@@ -32,10 +32,3 @@ class PasswordForm(UserCreationForm):
         current_year = datetime.datetime.now().year
         birth_year_choices = range(1901, current_year + 1)
         widgets = {"date_of_birth": SelectDateWidget(years=birth_year_choices)}
-
-
-class TweetForm(ModelForm):
-    class Meta:
-        model = Tweet
-        fields = ["user", "body", "image"]
-        widgets = {"body": Textarea(attrs={"placeholder": "What's Happening?"})}
