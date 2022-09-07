@@ -1,5 +1,6 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -23,24 +24,34 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class TweetEditView(LoginRequiredMixin, UpdateView):
+class TweetEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Tweet
     template_name = "tweets/tweet_edit.html"
     fields = ["body", "image"]
     success_url = reverse_lazy("user:home")
 
-    def dispatch(self, request, *args, **kwargs):
-        handler = super().dispatch(request, *args, **kwargs)
-        user = request.user
+    def test_func(self):
         tweet = self.get_object()
-        if not (tweet.user == user):
+        if not (tweet.user == self.request.user):
             raise PermissionDenied
-        return handler
+        return True
 
 
-class TweetDeleteView(LoginRequiredMixin, DeleteView):
+class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Tweet
     success_url = reverse_lazy("user:home")
+
+    def get(self, request, **kwargs):
+        kwargs["username"] = request.user.username
+        return redirect(
+            "tweets:tweet_detail", pk=kwargs["pk"], username=request.user.username
+        )
+
+    def test_func(self):
+        tweet = self.get_object()
+        if not (tweet.user == self.request.user):
+            raise PermissionDenied
+        return True
 
 
 class TweetDetailView(DetailView):
