@@ -31,12 +31,8 @@ urlpatterns = [
     path("home/", views.HomeView.as_view(), name="home"),
     path("<int:pk>/", views.ProfileView.as_view(), name="user_profile"),
     path("<int:pk>/edit/", views.EditProfileView.as_view(), name="edit_profile"),
-    path("<int:id>/follow", views.follow_view, name="follow"),
-    path("<int:id>/unfollow", views.unfollow_view, name="unfollow"),
-    path(
-        "<slug:username>/followers", views.FollowerListView.as_view(), name="followers"
-    ),
-    path(
-        "<slug:username>/following", views.FollowingListView.as_view(), name="following"
-    ),
+    path("<int:pk>/follow", views.follow_view, name="follow"),
+    path("<int:pk>/unfollow", views.unfollow_view, name="unfollow"),
+    path("<int:pk>/followers", views.FollowerListView.as_view(), name="followers"),
+    path("<int:pk>/following", views.FollowingListView.as_view(), name="following"),
 ]

@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     LoginView,
@@ -121,10 +123,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
         page_user = get_object_or_404(CustomUser, id=self.kwargs["pk"])
         tweets = Tweet.objects.filter(user_id=page_user.id)
         request_user = self.request.user
-        context["request_user"] = request_user
         context["tweets"] = tweets
         context["following"] = Follow.objects.filter(follower=page_user).count()
-        context["follower"] = Follow.objects.filter(following=page_user).count()
+        context["followers"] = Follow.objects.filter(following=page_user).count()
 
         if page_user != request_user:
             is_following = Follow.objects.filter(follower=request_user).filter(
@@ -170,33 +171,35 @@ class EditProfileView(LoginRequiredMixin, SuccessMessageMixin, UpdateWithInlines
 # Views for following
 @login_required
 def follow_view(request, **kwargs):
+    can_follow = False
     follower = CustomUser.objects.get(id=request.user.id)
-    following = CustomUser.objects.get(id=kwargs["id"])
+    following = CustomUser.objects.get(id=kwargs["pk"])
     if follower == following:
         messages.warning(request, "Haha, you can't follow yourself!")
-    else:
-        follow = Follow.objects.get_or_create(follower=follower, following=following)
-    if follow:
-        messages.success(
-            request, "WooHoo! You have now followed {}".format(following.username)
-        )
-    else:
+    elif Follow.objects.filter(follower=follower, following=following).exists():
         messages.warning(
-            request, "Seems like you're already following {}".format(following.username)
+            request, f"Seems like you're already following {following.username}"
         )
+    else:
+        can_follow = True
+    if can_follow:
+        Follow.objects.create(follower=follower, following=following)
+        messages.success(request, f"WooHoo! You have now followed {following.username}")
+        is_following = True
     return redirect("user:user_profile", pk=following.id)
 
 
 @login_required
 def unfollow_view(request, **kwargs):
     follower = CustomUser.objects.get(id=request.user.id)
-    following = CustomUser.objects.get(id=kwargs["id"])
+    following = CustomUser.objects.get(id=kwargs["pk"])
     if follower == following:
         messages.warning(request, "Haha, you can't follow yourself!")
     else:
         unfollow = Follow.objects.get(follower=follower, following=following)
         unfollow.delete()
-        messages.success(request, "You have unfollowed {}".format(following.username))
+        messages.success(request, f"You have unfollowed {following.username}")
+        is_following = False
     return redirect("user:user_profile", pk=following.id)
 
 
@@ -206,13 +209,10 @@ class FollowerListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(FollowerListView, self).get_context_data(**kwargs)
-        page_user = get_object_or_404(CustomUser, username=self.kwargs["username"])
-        request_user = self.request.user
-        context["request_user"] = request_user
+        page_user = get_object_or_404(CustomUser, pk=self.kwargs["pk"])
         context["page_user"] = page_user
         context["following"] = Follow.objects.filter(follower=page_user)
         context["followers"] = Follow.objects.filter(following=page_user)
-        context["followed"] = Follow.objects.filter(follower=request_user)
         return context
 
 
@@ -222,11 +222,8 @@ class FollowingListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(FollowingListView, self).get_context_data(**kwargs)
-        page_user = get_object_or_404(CustomUser, username=self.kwargs["username"])
-        request_user = self.request.user
-        context["request_user"] = request_user
+        page_user = get_object_or_404(CustomUser, pk=self.kwargs["pk"])
         context["page_user"] = page_user
         context["following"] = Follow.objects.filter(follower=page_user)
         context["followers"] = Follow.objects.filter(following=page_user)
-        context["followed"] = Follow.objects.filter(follower=request_user)
         return context

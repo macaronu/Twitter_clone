@@ -21,7 +21,7 @@
                 <div>
                     <div>
                         <a href="{% url 'user:user_profile' pk=tweet.user.id %}">
-                            <img class="prof-icon" style="float:left" src='https://freesvg.org/img/abstract-user-flat-4.png'>
+                            <img class="prof-icon" style="float:left" src="{{ tweet.user.profile.profile_img_url }}">
                         </a>
                         <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=tweet.user.id %}">{{ tweet.user }}</a>
                     </div>

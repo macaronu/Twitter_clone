@@ -12,16 +12,16 @@
             </a>
             <h3 style="padding-top: -10px; padding-left: 60px">{{ page_user }}</h3>
             <div class="follow">
-                <a href="{% url 'user:following' username=page_user.username %}"><h3 class="here">Following</h3></a>
-                <a href="{% url 'user:followers' username=page_user.username %}"><h3 style="color:rgb(70, 70, 70);">Followers</h3></a>
+                <a href="{% url 'user:following' pk=page_user.id %}"><h3 class="here">Following</h3></a>
+                <a href="{% url 'user:followers' pk=page_user.id %}"><h3 style="color:rgb(70, 70, 70);">Followers</h3></a>
             </div>
         </header>
         <div class="account-list">
         {% for follow in following %}
-            <div style="width: 70%;">
+            <div class="followers">
                 <div>
                     <a href="{% url 'user:user_profile' pk=follow.following.id %}">
-                        <img class="prof-icon" style="float:left" src='https://freesvg.org/img/abstract-user-flat-4.png'>
+                        <img class="prof-icon" style="float:left" src="{{ follow.following.profile.profile_img_url }}">
                     </a>
                     <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=follow.following.id %}">{{ follow.following.username }}</a>
                 </div>
