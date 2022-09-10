@@ -156,15 +156,6 @@ ul {
   min-height: fit-content;
 }
 
-.bio{
-  float:left;
-  padding: 10px;
-  clear: both;
-  height: 10px;
-  width: 70%;
-  padding-bottom: 1rem;
-}
-
 .prof-foot {
   margin-top: 100px;
   margin-left: 2rem;
@@ -186,6 +177,15 @@ ul {
 }
 .follow-count ul {
   float: left;
+}
+
+.bio{
+  float:left;
+  padding: 10px;
+  clear: both;
+  height: 10px;
+  width: 70%;
+  padding-bottom: 1rem;
 }
 
 .tweet {
