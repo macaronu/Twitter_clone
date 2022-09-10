@@ -71,10 +71,18 @@
                         </small>
                         <small style="opacity: 0.8; color:rgb(0, 0, 0); margin-left:15px;">
                             <!-- Like Buttons Here -->
-                            <a href="">
-                                <img style="width:20px; float:left;" src="https://www.iconpacks.net/icons/1/free-heart-icon-492-thumb.png">
-                                <p style="float:left;">{{tweet.likes}}</p>
-                            </a>
+                            <form method='POST' action="{% url 'tweets:like_tweet' tweet.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" style="all:unset;" name="tweet_id" value="{{ tweet.id }}">
+                                    {% if user in tweet.likes.all %}
+                                        <img style="width:20px; float:left;" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/512/heart-icon.png">
+                                        <p style="float:left; color:rgb(255, 23, 62);">{{ tweet.likes.count }}</p>
+                                    {% else %}
+                                        <img style="width:20px; float:left;" src="https://www.iconpacks.net/icons/1/free-heart-icon-492-thumb.png">
+                                        <p style="float:left;">{{ tweet.likes.count }}</p>
+                                    {% endif %}
+                                </button>
+                            </form>
                         </small>
                     </div>
                 </div>

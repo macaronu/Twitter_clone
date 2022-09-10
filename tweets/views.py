@@ -1,6 +1,7 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -54,3 +55,14 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class TweetDetailView(DetailView):
     queryset = Tweet.objects.select_related("user")
     template_name = "tweets/tweet_detail.html"
+
+
+# Views for liking
+@login_required
+def like_view(request, **kwargs):
+    tweet = get_object_or_404(Tweet, id=kwargs["pk"])
+    if request.user in tweet.likes.all():
+        tweet.likes.remove(request.user)
+    else:
+        tweet.likes.add(request.user)
+    return redirect(request.META.get("HTTP_REFERER", "redirect_if_referer_not_found"))

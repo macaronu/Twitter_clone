@@ -21,7 +21,7 @@
             <div class="followers">
                 <div>
                     <a href="{% url 'user:user_profile' pk=follow.follower.id %}">
-                        <img class="prof-icon" style="float:left" src="{{ follow.following.profile.profile_img_url }}">
+                        <img class="prof-icon" style="float:left" src="{{ follow.follower.profile.profile_img_url }}">
                     </a>
                     <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=follow.follower.id %}">{{ follow.follower.username }}</a>
                 </div>
