@@ -14,8 +14,8 @@
     {% endfor %}
     {% endif %} 
     <header>
-        <p style="padding: 10px; font-weight: bold;">{{ page_user.user }}</p>
-        {% if user.id == page_user.user.id %}
+        <p style="padding: 10px; font-weight: bold;">{{ page_user.username }}</p>
+        {% if user.id == page_user.id %}
         <a class="white-btn prof-head" href="{% url 'user:signout' %}">Sign out</a>
         {% else %}
         <a class="black-btn prof-head" href="">Follow</a>
