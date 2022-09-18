@@ -65,4 +65,4 @@ def like_view(request, **kwargs):
         tweet.likes.remove(request.user)
     else:
         tweet.likes.add(request.user)
-    return redirect(request.META.get("HTTP_REFERER", "redirect_if_referer_not_found"))
+    return redirect(request.META.get("HTTP_REFERER", "user:home"))

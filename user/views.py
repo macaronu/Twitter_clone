@@ -172,8 +172,8 @@ class EditProfileView(LoginRequiredMixin, SuccessMessageMixin, UpdateWithInlines
 @login_required
 def follow_view(request, **kwargs):
     can_follow = False
-    follower = CustomUser.objects.get(id=request.user.id)
-    following = CustomUser.objects.get(id=kwargs["pk"])
+    follower = get_object_or_404(CustomUser, id=request.user.id)
+    following = get_object_or_404(CustomUser, id=kwargs["pk"])
     if follower == following:
         messages.warning(request, "Haha, you can't follow yourself!")
     elif Follow.objects.filter(follower=follower, following=following).exists():
@@ -191,12 +191,14 @@ def follow_view(request, **kwargs):
 
 @login_required
 def unfollow_view(request, **kwargs):
-    follower = CustomUser.objects.get(id=request.user.id)
-    following = CustomUser.objects.get(id=kwargs["pk"])
+    follower = get_object_or_404(CustomUser, id=request.user.id)
+    following = get_object_or_404(CustomUser, id=kwargs["pk"])
     if follower == following:
         messages.warning(request, "Haha, you can't follow yourself!")
+    elif not Follow.objects.filter(follower=follower, following=following).exists():
+        pass
     else:
-        unfollow = Follow.objects.get(follower=follower, following=following)
+        unfollow = get_object_or_404(Follow, follower=follower, following=following)
         unfollow.delete()
         messages.success(request, f"You have unfollowed {following.username}")
         is_following = False

@@ -345,3 +345,71 @@ class DeleteTweetTests(TestCase):
                 kwargs={"pk": self.tweet.id},
             ),
         )
+
+
+class LikeTweetTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(
+            username="ポンデ", email="misdo@test.com", phone="", date_of_birth="1901-01-01"
+        )
+        self.user.set_password("12345")
+        self.user.save()
+        self.tweet = Tweet.objects.create(user=self.user, body="test")
+        self.client.login(username="ポンデ", password="12345")
+
+        self.user2 = CustomUser.objects.create(
+            username="リング", email="misdo@test.com", phone="", date_of_birth="1901-01-01"
+        )
+        self.user2.set_password("12345")
+        self.user2.save()
+        self.tweet2 = Tweet.objects.create(user=self.user2, body="test")
+
+    def test_post_success(self):
+        """
+        POST: tweets/<int:pk>/like/
+        詳細: like success
+        効果: 302
+        """
+        url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet2.id})
+        response = self.client.post(url)
+
+        self.assertTrue(self.user in self.tweet2.likes.all())
+        self.assertRedirects(response, reverse("user:home"))
+
+    def test_post_with_self(self):
+        """
+        POST: tweets/<int:pk>/like/
+        詳細: user can like their own tweets too
+        効果: 302
+        """
+        url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet.id})
+        response = self.client.post(url)
+
+        self.assertTrue(self.user in self.tweet.likes.all())
+        self.assertRedirects(response, reverse("user:home"))
+
+    def test_post_with_non_existent_tweet(self):
+        """
+        POST: tweets/<int:pk>/like/
+        詳細: like fails with non-existent tweet
+        効果: 404
+        """
+        url = reverse("tweets:like_tweet", kwargs={"pk": 5})
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(self.user in self.tweet2.likes.all())
+        self.assertFalse(self.user in self.tweet.likes.all())
+
+    def test_post_with_already_liking(self):
+        """
+        POST: tweets/<int:pk>/like/
+        詳細: already liked tweets are unliked
+        効果: 302
+        """
+        self.tweet2.likes.add(self.user)
+        url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet2.id})
+        response = self.client.post(url)
+
+        self.assertFalse(self.user in self.tweet2.likes.all())
+        self.assertRedirects(response, reverse("user:home"))
