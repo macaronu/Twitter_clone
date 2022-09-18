@@ -26,7 +26,6 @@ class CreateTweetTests(TestCase):
         data = {"body": "今日の太陽はサンシャイン", "image": ImageFile(open(path, "rb"))}
         response = self.client.post(self.url, data)
 
-        self.assertEqual(response.status_code, 302)
         self.assertTrue(Tweet.objects.filter(user=self.user).exists())
         tweet = Tweet.objects.get(user=self.user)
         self.assertEqual(tweet.body, data["body"])
@@ -44,7 +43,6 @@ class CreateTweetTests(TestCase):
         self.client.logout()
         response = self.client.post(self.url, data)
 
-        self.assertEqual(response.status_code, 302)
         self.assertFalse(Tweet.objects.exists())
         self.assertRedirects(response, reverse("user:signin") + "?next=/tweets/tweet/")
         self.assertRaises(PermissionError)
@@ -119,7 +117,6 @@ class EditTweetTests(TestCase):
         response = self.client.post(self.url, data)
         self.tweet.refresh_from_db()
 
-        self.assertEqual(response.status_code, 302)
         self.assertEqual(self.tweet.body, data["body"])
         self.assertTrue(self.tweet.image, data["image"])
         self.assertRedirects(response, reverse("user:home"))
@@ -297,8 +294,8 @@ class DeleteTweetTests(TestCase):
         """
         response = self.client.post(self.url)
 
-        self.assertEqual(response.status_code, 302)
         self.assertFalse(Tweet.objects.exists())
+        self.assertRedirects(response, reverse("user:home"))
 
     def test_delete_fails_if_unauthorized(self):
         """
@@ -342,7 +339,6 @@ class DeleteTweetTests(TestCase):
         """
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 302)
         self.assertTrue(Tweet.objects.exists())
         self.assertRedirects(
             response,
