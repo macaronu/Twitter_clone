@@ -10,7 +10,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 
-from .models import Tweet
+from .models import Tweet, TweetLike
 
 
 # Views for tweeting
@@ -42,7 +42,7 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Tweet
     success_url = reverse_lazy("user:home")
 
-    def get(self, **kwargs):
+    def get(self, request, **kwargs):
         return redirect("tweets:tweet_detail", pk=kwargs["pk"])
 
     def test_func(self):
@@ -56,13 +56,22 @@ class TweetDetailView(DetailView):
     queryset = Tweet.objects.select_related("user")
     template_name = "tweets/tweet_detail.html"
 
+    def get_context_data(self, **kwargs):
+        tweet = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context["liked"] = TweetLike.objects.filter(
+            tweet=tweet, liked_by=self.request.user
+        ).exists()
+        return context
+
 
 # Views for liking
 @login_required
 def like_view(request, **kwargs):
     tweet = get_object_or_404(Tweet, id=kwargs["pk"])
-    if request.user in tweet.likes.all():
-        tweet.likes.remove(request.user)
+    like = TweetLike.objects.filter(tweet=tweet, liked_by=request.user)
+    if like.exists():
+        like.delete()
     else:
-        tweet.likes.add(request.user)
+        like.create(tweet=tweet, liked_by=request.user)
     return redirect(request.META.get("HTTP_REFERER", "user:home"))

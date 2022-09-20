@@ -17,7 +17,7 @@ from extra_views import UpdateWithInlinesView, InlineFormSetFactory, SuccessMess
 
 from .models import CustomUser, Profile, Follow
 from .forms import SignupForm, PasswordForm
-from tweets.models import Tweet
+from tweets.models import Tweet, TweetLike
 
 
 # Views for signing up
@@ -111,6 +111,14 @@ class HomeView(LoginRequiredMixin, ListView):
     template_name = "user/home.html"
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        like_list = TweetLike.objects.filter(liked_by=self.request.user).values_list(
+            "tweet", flat=True
+        )
+        context["like_list"] = list(like_list)
+        return context
+
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
@@ -120,18 +128,22 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        page_user = get_object_or_404(CustomUser, id=self.kwargs["pk"])
+        page_user = self.get_object()
         tweets = Tweet.objects.filter(user_id=page_user.id)
         request_user = self.request.user
+        like_list = TweetLike.objects.filter(liked_by=request_user).values_list(
+            "tweet", flat=True
+        )
         context["tweets"] = tweets
+        context["like_list"] = list(like_list)
         context["following"] = Follow.objects.filter(follower=page_user).count()
         context["followers"] = Follow.objects.filter(following=page_user).count()
 
         if page_user != request_user:
-            is_following = Follow.objects.filter(follower=request_user).filter(
-                following=page_user
-            )
-            context["is_following"] = True if is_following else False
+            is_following = Follow.objects.filter(
+                follower=request_user, following=page_user
+            ).exists()
+            context["is_following"] = is_following
 
         return context
 
@@ -185,7 +197,6 @@ def follow_view(request, **kwargs):
     if can_follow:
         Follow.objects.create(follower=follower, following=following)
         messages.success(request, f"WooHoo! You have now followed {following.username}")
-        is_following = True
     return redirect("user:user_profile", pk=following.id)
 
 
@@ -201,7 +212,6 @@ def unfollow_view(request, **kwargs):
         unfollow = get_object_or_404(Follow, follower=follower, following=following)
         unfollow.delete()
         messages.success(request, f"You have unfollowed {following.username}")
-        is_following = False
     return redirect("user:user_profile", pk=following.id)
 
 

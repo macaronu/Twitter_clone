@@ -2,7 +2,7 @@ from django.core.files.images import ImageFile
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from .models import Tweet
+from .models import Tweet, TweetLike
 from user.models import CustomUser
 
 
@@ -373,7 +373,9 @@ class LikeTweetTests(TestCase):
         url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet2.id})
         response = self.client.post(url)
 
-        self.assertTrue(self.user in self.tweet2.likes.all())
+        self.assertTrue(
+            TweetLike.objects.filter(tweet=self.tweet2, liked_by=self.user).exists()
+        )
         self.assertRedirects(response, reverse("user:home"))
 
     def test_post_with_self(self):
@@ -385,7 +387,9 @@ class LikeTweetTests(TestCase):
         url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet.id})
         response = self.client.post(url)
 
-        self.assertTrue(self.user in self.tweet.likes.all())
+        self.assertTrue(
+            TweetLike.objects.filter(tweet=self.tweet, liked_by=self.user).exists()
+        )
         self.assertRedirects(response, reverse("user:home"))
 
     def test_post_with_non_existent_tweet(self):
@@ -398,8 +402,7 @@ class LikeTweetTests(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 404)
-        self.assertFalse(self.user in self.tweet2.likes.all())
-        self.assertFalse(self.user in self.tweet.likes.all())
+        self.assertFalse(TweetLike.objects.exists())
 
     def test_post_with_already_liking(self):
         """
@@ -407,9 +410,9 @@ class LikeTweetTests(TestCase):
         詳細: already liked tweets are unliked
         効果: 302
         """
-        self.tweet2.likes.add(self.user)
+        TweetLike.objects.create(tweet=self.tweet2, liked_by=self.user)
         url = reverse("tweets:like_tweet", kwargs={"pk": self.tweet2.id})
         response = self.client.post(url)
 
-        self.assertFalse(self.user in self.tweet2.likes.all())
+        self.assertFalse(TweetLike.objects.exists())
         self.assertRedirects(response, reverse("user:home"))

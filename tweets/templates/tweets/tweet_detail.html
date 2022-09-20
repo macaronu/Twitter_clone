@@ -70,7 +70,7 @@
                             <form method='POST' action="{% url 'tweets:like_tweet' tweet.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" style="all:unset;" name="tweet_id" value="{{ tweet.id }}">
-                                    {% if user in tweet.likes.all %}
+                                    {% if liked %}
                                         <img style="width:20px; float:left; cursor:pointer;" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/512/heart-icon.png">
                                         <p style="float:left; color:rgb(255, 23, 62);">{{ tweet.likes.count }}</p>
                                     {% else %}

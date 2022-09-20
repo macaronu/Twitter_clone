@@ -19,3 +19,14 @@ class Tweet(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class TweetLike(models.Model):
+    tweet = models.ForeignKey(Tweet, related_name="likes", on_delete=models.CASCADE)
+    liked_by = models.ForeignKey(
+        "user.CustomUser", related_name="liked_tweets", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tweet.id} : liked by {self.liked_by.username}"

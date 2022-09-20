@@ -40,4 +40,4 @@ class Follow(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "{} : {}".format(self.follower.username, self.following.username)
+        return f"{self.follower.username} : {self.following.username}"
