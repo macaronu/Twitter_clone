@@ -18,7 +18,7 @@ class CreateTweetTests(TestCase):
 
     def test_post_success(self):
         """
-        POST: tweets/tweet/
+        POST: tweets/post/
         詳細: tweet success and redirects
         効果: 302
         """
@@ -34,7 +34,7 @@ class CreateTweetTests(TestCase):
 
     def test_post_fails_if_unauthorized(self):
         """
-        POST: tweets/tweet/
+        POST: tweets/post/
         詳細: unauthorized access redirects to signin page
         効果: 302
         """
@@ -44,12 +44,12 @@ class CreateTweetTests(TestCase):
         response = self.client.post(self.url, data)
 
         self.assertFalse(Tweet.objects.exists())
-        self.assertRedirects(response, reverse("user:signin") + "?next=/tweets/tweet/")
+        self.assertRedirects(response, reverse("user:signin") + "?next=/tweets/post/")
         self.assertRaises(PermissionError)
 
     def test_post_fails_without_essential(self):
         """
-        POST: tweets/tweet/
+        POST: tweets/post/
         詳細: body is not in data
         効果: 200
         """
@@ -62,7 +62,7 @@ class CreateTweetTests(TestCase):
 
     def test_post_fails_with_empty_data(self):
         """
-        POST: tweets/tweet/
+        POST: tweets/post/
         詳細: body is empty
         効果: 200
         """
@@ -75,7 +75,7 @@ class CreateTweetTests(TestCase):
 
     def test_post_fails_with_invalid_img_data(self):
         """
-        POST: tweets/tweet/
+        POST: tweets/post/
         詳細: image is invalid
         効果: 200
         """
@@ -223,12 +223,12 @@ class GetDetailTweetTests(TestCase):
         )
         self.url = reverse(
             "tweets:tweet_detail",
-            kwargs={"username": self.user.username, "pk": self.tweet.id},
+            kwargs={"pk": self.tweet.id},
         )
 
     def test_get_success(self):
         """
-        GET: tweets/<str:username>/<int:pk>/
+        GET: tweets/<int:pk>/
         詳細: get success
         効果: 200
         """
@@ -239,7 +239,7 @@ class GetDetailTweetTests(TestCase):
 
     def test_get_success_by_other_users(self):
         """
-        POST: tweets/<str:username>/<int:pk>/
+        POST: tweets/<int:pk>/
         詳細: other users can access detail page
         効果: 200
         """
@@ -260,13 +260,11 @@ class GetDetailTweetTests(TestCase):
 
     def test_get_fails_with_invalid_pk(self):
         """
-        POST: tweets/<str:username>/<int:pk>/
+        POST: tweets/<int:pk>/
         詳細: pk is invalid
         効果: 404
         """
-        self.url = reverse(
-            "tweets:tweet_detail", kwargs={"username": self.user.username, "pk": "555"}
-        )
+        self.url = reverse("tweets:tweet_detail", kwargs={"pk": "555"})
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 404)
@@ -344,6 +342,6 @@ class DeleteTweetTests(TestCase):
             response,
             reverse(
                 "tweets:tweet_detail",
-                kwargs={"pk": self.tweet.id, "username": self.user.username},
+                kwargs={"pk": self.tweet.id},
             ),
         )

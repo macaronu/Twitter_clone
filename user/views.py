@@ -105,7 +105,7 @@ class PasswordResetCompleteView(PasswordResetCompleteView):
 
 # Views for users
 class HomeView(LoginRequiredMixin, ListView):
-    model = Tweet
+    queryset = Tweet.objects.select_related("user")
     template_name = "user/home.html"
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
 

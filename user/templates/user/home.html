@@ -39,7 +39,7 @@
                     {%  endif %}
                     </div>
                 </div>
-                <a style="text-decoration: none;" href="{% url 'tweets:tweet_detail' username=tweet.user pk=tweet.pk %}">
+                <a style="text-decoration: none;" href="{% url 'tweets:tweet_detail' pk=tweet.pk %}">
                     <div class="tweet-body">
                         <p>{{ tweet.body }}</p>
                         {% if tweet.image %}<img src='{{ tweet.image.url }}'>{% endif %}
