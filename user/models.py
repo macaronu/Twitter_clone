@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 
 def directory_path(instance, filename):
-    return f'profile/images/user_{instance.user.id}/{filename}'
+    return f"profile/images/user_{instance.user.id}/{filename}"
 
 
 class CustomUser(AbstractUser):
@@ -17,8 +18,7 @@ class CustomUser(AbstractUser):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     profile_img = models.ImageField(upload_to=directory_path, blank=True)
     bio = models.TextField(max_length=280, null=True, blank=True)
 

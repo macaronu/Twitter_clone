@@ -7,23 +7,21 @@
     <body>
     {% block content %}
         <header>
-            <p style="padding: 10px; font-weight: bold;">Home</p>
-            <a class="white-btn" style="margin-right:30%; margin-top: -70px; float: right;" href="{% url 'user:signout' %}">Sign out</a>
+            <h3 style="padding-top: -10px; margin-left: 3rem">Tweet</h3>
+            <a style="margin-right:30%; margin-top: -60px; float: left;" href="{% url 'user:home' %}">
+                <img class="material-icon" src="https://cdn-icons-png.flaticon.com/512/109/109618.png">
+            </a>
         </header>
-        <div class="profile" style="margin-top: 50px;">
-            <h2 style="padding-top: 50px; font-size: 50px;">Hi, {{ user }}!</h1>
-            <h2>Welcome to your twitter account.</h2>
-            <a class="blue-btn" style="float:right; margin-top: -70px;" href="{% url 'tweets:tweet' %}">Tweet</a>
-        </div>
-        {% for tweet in object_list %}
-        <article class="tweet">
-            <div style="width: 100%; word-break: break-all;">
+        <article class="tweet-detail">
+            <div style="width: 100%; word-break: break-all; padding-top: 50px;">
                 <div>
                     <div>
                         <a href="{% url 'user:user_profile' pk=tweet.user.id %}">
-                            <img class="prof-icon" style="float:left" src='https://freesvg.org/img/abstract-user-flat-4.png'>
+                            <img class="prof-icon" style="float:left; width: 70px; height: 70px;" src='https://freesvg.org/img/abstract-user-flat-4.png'>
                         </a>
-                        <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=tweet.user.id %}">{{ tweet.user }}</a>
+                        <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px; font-size:50px;" href="{% url 'user:user_profile' pk=tweet.user.id %}">
+                            {{ tweet.user }}
+                        </a>
                     </div>
                     <div>
                     {% if tweet.user.id == user.id %}
@@ -39,12 +37,10 @@
                     {%  endif %}
                     </div>
                 </div>
-                <a style="text-decoration: none;" href="{% url 'tweets:tweet_detail' pk=tweet.pk %}">
-                    <div class="tweet-body">
-                        <p>{{ tweet.body }}</p>
-                        {% if tweet.image %}<img src='{{ tweet.image.url }}'>{% endif %}
-                    </div>
-                </a>
+                <div class="tweet-body" style="font-size: larger;">
+                    <p>{{ tweet.body }}</p>
+                    {% if tweet.image %}<img src='{{ tweet.image.url }}'>{% endif %}
+                </div>
                 <div>
                     <small style="opacity: 0.4;">
                         {{ tweet.created_at | date:"H:i l, y.m.d" }}
@@ -80,7 +76,6 @@
                 </div>
             </div>
         </article>
-        {% endfor %}
     {% endblock content %}
     </body>
 </html>
