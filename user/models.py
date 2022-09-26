@@ -28,3 +28,23 @@ class Profile(models.Model):
             return self.profile_img.url
         else:
             return "https://i.pinimg.com/550x/7a/95/ef/7a95ef5acbc87c558b3b4d7d0ddb3469.jpg"
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        CustomUser, related_name="followers", on_delete=models.CASCADE
+    )
+    following = models.ForeignKey(
+        CustomUser, related_name="following", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"], name="follow_unique"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.follower.username} : {self.following.username}"

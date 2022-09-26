@@ -1,0 +1,34 @@
+{% extends "base_home.html" %}
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+    </head>
+    <body>
+    {% block content %}
+        <header style="height: 100px;">
+            <a style="float: left;" href="{% url 'user:user_profile' pk=page_user.id %}">
+                <img class="material-icon" src="https://cdn-icons-png.flaticon.com/512/109/109618.png">
+            </a>
+            <h3 style="padding-top: -10px; padding-left: 60px">{{ page_user }}</h3>
+            <div class="follow">
+                <a href="{% url 'user:following' pk=page_user.id %}"><h3 class="here">Following</h3></a>
+                <a href="{% url 'user:followers' pk=page_user.id %}"><h3 style="color:rgb(70, 70, 70);">Followers</h3></a>
+            </div>
+        </header>
+        <div class="account-list">
+        {% for follow in following_list %}
+            <div class="followers">
+                <div>
+                    <a href="{% url 'user:user_profile' pk=follow.following.id %}">
+                        <img class="prof-icon" style="float:left" src="{{ follow.following.profile.profile_img_url }}">
+                    </a>
+                    <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=follow.following.id %}">{{ follow.following.username }}</a>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% endblock content %}
+    </body>
+</html>
+

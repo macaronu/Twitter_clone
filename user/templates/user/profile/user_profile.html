@@ -16,9 +16,11 @@
     <header>
         <p style="padding: 10px; font-weight: bold;">{{ page_user.username }}</p>
         {% if user.id == page_user.id %}
-        <a class="white-btn prof-head" href="{% url 'user:signout' %}">Sign out</a>
+            <a class="white-btn prof-head" href="{% url 'user:signout' %}">Sign out</a>
+        {% elif is_following %}
+            <a class="white-btn prof-head" href="{% url 'user:unfollow' pk=page_user.pk %}">Unfollow</a>
         {% else %}
-        <a class="black-btn prof-head" href="">Follow</a>
+            <a class="black-btn prof-head" href="{% url 'user:follow' pk=page_user.pk %}">Follow</a>
         {% endif %}
     </header>
 
@@ -28,8 +30,10 @@
         <div class="btn_field">
             {% if user.id == page_user.id %}
                 <a class="white-btn prof-foot" href="{% url 'user:edit_profile' pk=user.pk %}">Edit</a>
+            {% elif is_following %}
+                <a class="white-btn prof-foot" href="{% url 'user:unfollow' pk=page_user.pk %}">Unfollow</a>
             {% else %}
-            <a class="black-btn prof-foot" href="" style="margin-top: 100px; margin-left: 2rem; float:left;">Follow</a>
+                <a class="black-btn prof-foot" href="{% url 'user:follow' pk=page_user.pk %}">Follow</a>
             {% endif %}
         </div>
         {% if page_user.profile.bio %}
@@ -38,8 +42,8 @@
         {% endif %}
         <div class="bio note">Joined at: {{ page_user.created_at }}</div>
         <div class="follow-count">
-            <a href="#"><ul> Following</ul></a>
-            <a href="#"><ul> Followers</ul></a>
+            <a href="{% url 'user:following' pk=page_user.id %}"><ul> Following</ul></a>
+            <a href="{% url 'user:followers' pk=page_user.id %}"><ul> Followers</ul></a>
         </div>
         <h3 style="clear: both; padding-top: 10px;">Tweets</h3>
     </div>
@@ -50,7 +54,7 @@
                 <div>
                     <div>
                         <a href="{% url 'user:user_profile' pk=page_user.id %}">
-                            <img class="prof-icon" style="float:left" src='https://freesvg.org/img/abstract-user-flat-4.png'>
+                            <img class="prof-icon" style="float:left" src="{{ page_user.profile.profile_img_url }}">
                         </a>
                         <a class="prof-name" style="float: left; margin-left: 10px; margin-top: 8px;" href="{% url 'user:user_profile' pk=page_user.id %}">{{ page_user.username }}</a>
                     </div>
@@ -100,10 +104,15 @@
                         </small>
                         <small style="opacity: 0.8; color:rgb(0, 0, 0); margin-left:15px;">
                             <!-- Like Buttons Here -->
-                            <a href="">
-                                <img style="width:20px; float:left;" src="https://www.iconpacks.net/icons/1/free-heart-icon-492-thumb.png">
-                                <p style="float:left;">{{tweet.likes}}</p>
-                            </a>
+                            <button type="button" name="{{tweet.id}}" style="all:unset;" class="ajax-like">
+                                {% if tweet.id in like_list %}
+                                  <i class="fas fa-heart myhrt-red fa-lg" id="heart"></i>
+                                  <p class="red" style="float:left;" id="like-count">{{ tweet.likes.count }}</p>
+                                {% else %}
+                                  <i class="far fa-heart myhrt fa-lg" id="heart"></i>
+                                  <p style="float:left;" id="like-count">{{ tweet.likes.count }}</p>
+                                {% endif %}
+                            </button>
                         </small>
                     </div>
                 </div>
@@ -116,3 +125,10 @@
     {% endblock content %}
     </body>
 </html>
+{% block extrascripts %}
+<script>
+    var csrftoken = "{{ csrf_token }}";
+    var url = "{% url 'tweets:like_tweet' %}";
+</script>
+<script src="{% static 'user/script.js' %}"></script>
+{% endblock %}

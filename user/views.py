@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     LoginView,
@@ -13,7 +15,7 @@ from django.views.generic import DetailView, ListView
 from django.urls import reverse_lazy
 from extra_views import UpdateWithInlinesView, InlineFormSetFactory, SuccessMessageMixin
 
-from .models import CustomUser, Profile
+from .models import CustomUser, Profile, Follow
 from .forms import SignupForm, PasswordForm
 from tweets.models import Tweet
 
@@ -109,6 +111,13 @@ class HomeView(LoginRequiredMixin, ListView):
     template_name = "user/home.html"
     permission_denied_message = "Oops! Seems like you haven't signed in yet."
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["like_list"] = self.request.user.liked_tweets.values_list(
+            "tweet", flat=True
+        )
+        return context
+
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
@@ -118,9 +127,16 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        page_user = get_object_or_404(CustomUser, id=self.kwargs["pk"])
-        tweets = Tweet.objects.filter(user_id=page_user.id)
-        context["tweets"] = tweets
+        page_user = self.get_object()
+        request_user = self.request.user
+        context["tweets"] = page_user.tweets.all()
+        context["like_list"] = request_user.liked_tweets.all()
+        context["following"] = page_user.followers.count()
+        context["followers"] = page_user.following.count()
+        if page_user != request_user:
+            is_following = page_user.followers.filter(follower=request_user).exists()
+            context["is_following"] = is_following
+
         return context
 
 
@@ -154,3 +170,65 @@ class EditProfileView(LoginRequiredMixin, SuccessMessageMixin, UpdateWithInlines
         if not self.user_passes_test(request):
             return redirect("user:home")
         return super().dispatch(request, *args, **kwargs)
+
+
+# Views for following
+@login_required
+def follow_view(request, **kwargs):
+    follower = get_object_or_404(CustomUser, id=request.user.id)
+    following = get_object_or_404(CustomUser, id=kwargs["pk"])
+    if follower == following:
+        messages.warning(request, "Haha, you can't follow yourself!")
+    elif Follow.objects.filter(follower=follower, following=following).exists():
+        messages.warning(
+            request, f"Seems like you're already following {following.username}"
+        )
+    else:
+        Follow.objects.create(follower=follower, following=following)
+        messages.success(request, f"WooHoo! You have now followed {following.username}")
+    return redirect("user:user_profile", pk=following.id)
+
+
+@login_required
+def unfollow_view(request, **kwargs):
+    follower = get_object_or_404(CustomUser, id=request.user.id)
+    following = get_object_or_404(CustomUser, id=kwargs["pk"])
+    if follower == following:
+        messages.warning(request, "Haha, you can't follow yourself!")
+    elif not Follow.objects.filter(follower=follower, following=following).exists():
+        pass
+    else:
+        unfollow = get_object_or_404(Follow, follower=follower, following=following)
+        unfollow.delete()
+        messages.success(request, f"You have unfollowed {following.username}")
+    return redirect("user:user_profile", pk=following.id)
+
+
+class FollowerListView(LoginRequiredMixin, ListView):
+    model = Follow
+    template_name = "user/follow/followers.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowerListView, self).get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, pk=self.kwargs["pk"])
+        followers_list = Follow.objects.select_related("following").filter(
+            following=page_user
+        )
+        context["page_user"] = page_user
+        context["followers_list"] = followers_list
+        return context
+
+
+class FollowingListView(LoginRequiredMixin, ListView):
+    model = Follow
+    template_name = "user/follow/following.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowingListView, self).get_context_data(**kwargs)
+        page_user = get_object_or_404(CustomUser, pk=self.kwargs["pk"])
+        following_list = Follow.objects.select_related("follower").filter(
+            follower=page_user
+        )
+        context["page_user"] = page_user
+        context["following_list"] = following_list
+        return context

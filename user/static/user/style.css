@@ -174,7 +174,6 @@ ul {
   clear: both;
   display: flex;
   font-weight: bold;
-  padding-top: 10px;
 }
 .follow-count ul {
   float: left;
@@ -213,6 +212,7 @@ ul {
 .prof-icon {
   width: 30px;
   height: 30px;
+  border-radius: 3rem;
 }
 
 .prof-icon:hover {
@@ -283,6 +283,12 @@ ul {
   text-decoration: none;
 }
 
+.followers {
+  width: 70%; 
+  clear:both; 
+  padding-top: 20; 
+}
+
 .here {
   color: rgb(0, 0, 0);
   border-bottom: 3px solid;
@@ -298,6 +304,23 @@ ul {
   border-style: solid;
   border-color: #555 transparent transparent transparent;
   color: #555;
+}
+
+.myhrt {
+  float: left;
+  padding-top: 5px;
+  cursor: pointer;
+}
+
+.myhrt-red {
+  float: left;
+  padding-top: 5px;
+  color: rgb(255, 23, 62);
+  cursor: pointer;
+}
+
+.red {
+  color: rgb(255, 23, 62);
 }
 
 @media (max-width: 880px), screen and (orientation: portrait) {

@@ -3,8 +3,8 @@ from django.core.files.images import ImageFile
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from .forms import SignupForm
-from .models import CustomUser
+from ..forms import SignupForm
+from ..models import CustomUser
 
 
 class CreateUserFormTests(TestCase):
