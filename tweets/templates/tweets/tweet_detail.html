@@ -3,6 +3,7 @@
     <head>
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
+        <script src="{% static 'user/like.js' %}"></script>
     </head>
     <body>
     {% block content %}
@@ -67,18 +68,15 @@
                         </small>
                         <small style="opacity: 0.8; color:rgb(0, 0, 0); margin-left:15px;">
                             <!-- Like Buttons Here -->
-                            <form method='POST' action="{% url 'tweets:like_tweet' tweet.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" style="all:unset;" name="tweet_id" value="{{ tweet.id }}">
-                                    {% if liked %}
-                                        <img style="width:20px; float:left; cursor:pointer;" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/512/heart-icon.png">
-                                        <p style="float:left; color:rgb(255, 23, 62);">{{ tweet.likes.count }}</p>
-                                    {% else %}
-                                        <img style="width:20px; float:left; cursor: pointer;" src="https://www.iconpacks.net/icons/1/free-heart-icon-492-thumb.png">
-                                        <p style="float:left;">{{ tweet.likes.count }}</p>
-                                    {% endif %}
-                                </button>
-                            </form>
+                            <button type="button" name="{{tweet.id}}" style="all:unset;" class="ajax-like">
+                                {% if tweet.id in like_list %}
+                                  <i class="fas fa-heart myhrt-red fa-lg" id="heart"></i>
+                                  <p style="float:left;" class="red" id="like-count">{{ tweet.likes.count }}</p>
+                                {% else %}
+                                  <i class="far fa-heart myhrt fa-lg" id="heart"></i>
+                                  <p style="float:left;" id="like-count">{{ tweet.likes.count }}</p>
+                                {% endif %}
+                            </button>
                         </small>
                     </div>
                 </div>
@@ -87,3 +85,10 @@
     {% endblock content %}
     </body>
 </html>
+{% block extrascripts %}
+<script>
+    var csrftoken = "{{ csrf_token }}";
+    var url = "{% url 'tweets:like_tweet' %}";
+</script>
+<script src="{% static 'user/script.js' %}"></script>
+{% endblock %}

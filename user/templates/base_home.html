@@ -1,6 +1,8 @@
 <html>
     <head>
         {% load static %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="{% static 'user/style.css' %}">
     </head>
     <body>
@@ -15,3 +17,6 @@
         </div>
     </body>
 </html>
+
+{% block extrascripts %}
+{% endblock %}

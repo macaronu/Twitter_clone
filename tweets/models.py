@@ -28,5 +28,10 @@ class TweetLike(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["tweet", "liked_by"], name="like_unique"),
+        ]
+
     def __str__(self):
         return f"{self.tweet.id} : liked by {self.liked_by.username}"

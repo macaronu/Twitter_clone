@@ -17,7 +17,7 @@
             </div>
         </header>
         <div class="account-list">
-        {% for follow in following %}
+        {% for follow in following_list %}
             <div class="followers">
                 <div>
                     <a href="{% url 'user:user_profile' pk=follow.following.id %}">

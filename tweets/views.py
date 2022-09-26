@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import (
     CreateView,
@@ -52,7 +53,7 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return True
 
 
-class TweetDetailView(DetailView):
+class TweetDetailView(LoginRequiredMixin, DetailView):
     queryset = Tweet.objects.select_related("user")
     template_name = "tweets/tweet_detail.html"
 
@@ -66,12 +67,17 @@ class TweetDetailView(DetailView):
 
 
 # Views for liking
-@login_required
+@login_required(login_url="user:signup")
 def like_view(request, **kwargs):
-    tweet = get_object_or_404(Tweet, id=kwargs["pk"])
+    tweetid = request.POST.get("tweetid")
+    tweet = get_object_or_404(Tweet, id=tweetid)
     like = TweetLike.objects.filter(tweet=tweet, liked_by=request.user)
+    context = {"user": request.user.username, "tweetid": tweetid}
     if like.exists():
         like.delete()
+        context["method"] = "delete"
     else:
         like.create(tweet=tweet, liked_by=request.user)
-    return redirect(request.META.get("HTTP_REFERER", "user:home"))
+        context["method"] = "create"
+    context["like_count"] = tweet.likes.count()
+    return JsonResponse(context)

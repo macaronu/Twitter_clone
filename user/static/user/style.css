@@ -306,6 +306,23 @@ ul {
   color: #555;
 }
 
+.myhrt {
+  float: left;
+  padding-top: 5px;
+  cursor: pointer;
+}
+
+.myhrt-red {
+  float: left;
+  padding-top: 5px;
+  color: rgb(255, 23, 62);
+  cursor: pointer;
+}
+
+.red {
+  color: rgb(255, 23, 62);
+}
+
 @media (max-width: 880px), screen and (orientation: portrait) {
   .index {
     display: flex;
